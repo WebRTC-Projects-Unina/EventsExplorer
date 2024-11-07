@@ -1,5 +1,6 @@
-const express = require('express');
-const jwt = require('jsonwebtoken');
+import express from 'express';
+import jwt from 'jsonwebtoken';
+
 const app = express();
 const port = 3000;
 
@@ -129,3 +130,5 @@ app.delete('/api/events/:id', authenticateToken, authorizeAdmin, (req, res) => {
 app.listen(port, () => {
     console.log(`Event API server running at http://localhost:${port}`);
 });
+
+export default app;
