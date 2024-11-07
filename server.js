@@ -1,21 +1,16 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import db from './database.js';
 import users from './models/user.js';
+
 const app = express();
 const port = 3000;
-
 app.use(express.json());
 
-// Secret key for JWT (in a real app, store this securely)
 const JWT_SECRET = 'your_secret_key';
 
-// In-memory storage for events and users
-let events = [];
-let eventId = 1;
 
 
-
-// Middleware to authenticate requests
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -29,7 +24,6 @@ function authenticateToken(req, res, next) {
     });
 }
 
-// Middleware to check if the user is an admin
 function authorizeAdmin(req, res, next) {
     if (req.user.role !== 'admin') {
         return res.status(403).json({ error: 'Access denied' });
@@ -37,15 +31,19 @@ function authorizeAdmin(req, res, next) {
     next();
 }
 
-// Helper function to validate and assign tag IDs
-function createTags(tags) {
-    return tags.map(tag => ({
-        id: tagId++,
-        name: tag.name
-    }));
+// Helper function to manage tags
+function manageTags(tags, eventId) {
+    const getTag = db.prepare('SELECT id FROM tags WHERE name = ?');
+    const insertTag = db.prepare('INSERT OR IGNORE INTO tags (name) VALUES (?)');
+    const linkTagToEvent = db.prepare('INSERT OR IGNORE INTO event_tags (eventId, tagId) VALUES (?, ?)');
+
+    tags.forEach(tag => {
+        insertTag.run(tag.name);
+        const tagId = getTag.get(tag.name).id;
+        linkTagToEvent.run(eventId, tagId);
+    });
 }
 
-// Login route to get a token
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const user = users.find(u => u.username === username && u.password === password);
@@ -59,81 +57,83 @@ app.post('/api/login', (req, res) => {
     res.json({ token });
 });
 
-// Routes
-
-// Create a new event (admin only)
+// Create event endpoint
 app.post('/api/events', authenticateToken, authorizeAdmin, (req, res) => {
     const { name, date, location, description, tags } = req.body;
-
     if (!name || !date || !location) {
         return res.status(400).json({ error: 'Name, date, and location are required' });
     }
 
-    const newEvent = {
-        id: eventId++,
-        name,
-        date,
-        location,
-        description,
-        tags: tags ? createTags(tags) : []
-    };
+    const event = db.prepare('INSERT INTO events (name, date, location, description) VALUES (?, ?, ?, ?)').run(name, date, location, description);
+    if (tags) manageTags(tags, event.lastInsertRowid);
 
-    events.push(newEvent);
-    res.status(201).json(newEvent);
+    res.status(201).json({ id: event.lastInsertRowid, name, date, location, description, tags: tags || [] });
 });
 
-// Read all events (open to all users)
+// Retrieve events with tags
 app.get('/api/events', (req, res) => {
-    res.json(events);
+    const events = db.prepare(`
+    SELECT e.id, e.name, e.date, e.location, e.description,
+           COALESCE(json_group_array(json_object('id', t.id, 'name', t.name)), '[]') as tags
+    FROM events e
+    LEFT JOIN event_tags et ON e.id = et.eventId
+    LEFT JOIN tags t ON et.tagId = t.id
+    GROUP BY e.id
+  `).all();
+
+    res.json(events.map(event => ({ ...event, tags: JSON.parse(event.tags) })));
 });
 
-// Read a specific event by ID (open to all users)
 app.get('/api/events/:id', (req, res) => {
-    const eventId = parseInt(req.params.id);
-    const event = events.find(e => e.id === eventId);
+    const event = db.prepare(`
+    SELECT e.id, e.name, e.date, e.location, e.description,
+           COALESCE(json_group_array(json_object('id', t.id, 'name', t.name)), '[]') as tags
+    FROM events e
+    LEFT JOIN event_tags et ON e.id = et.eventId
+    LEFT JOIN tags t ON et.tagId = t.id
+    WHERE e.id = ?
+    GROUP BY e.id
+  `).get(req.params.id);
 
-    if (!event) {
-        return res.status(404).json({ error: 'Event not found' });
-    }
-
-    res.json(event);
+    if (!event) return res.status(404).json({ error: 'Event not found' });
+    res.json({ ...event, tags: JSON.parse(event.tags) });
 });
 
-// Update an existing event by ID (admin only)
+// Update event endpoint
 app.put('/api/events/:id', authenticateToken, authorizeAdmin, (req, res) => {
-    const eventId = parseInt(req.params.id);
     const { name, date, location, description, tags } = req.body;
+    const event = db.prepare('SELECT * FROM events WHERE id = ?').get(req.params.id);
 
-    const event = events.find(e => e.id === eventId);
+    if (!event) return res.status(404).json({ error: 'Event not found' });
 
-    if (!event) {
-        return res.status(404).json({ error: 'Event not found' });
+    db.prepare('UPDATE events SET name = ?, date = ?, location = ?, description = ? WHERE id = ?')
+        .run(name || event.name, date || event.date, location || event.location, description || event.description, req.params.id);
+
+    if (tags) {
+        db.prepare('DELETE FROM event_tags WHERE eventId = ?').run(req.params.id); // Clear old tag associations
+        manageTags(tags, req.params.id);
     }
 
-    if (name) event.name = name;
-    if (date) event.date = date;
-    if (location) event.location = location;
-    if (description) event.description = description;
-    if (tags) event.tags = createTags(tags);
-    res.json(event);
+    const updatedEvent = db.prepare(`
+    SELECT e.id, e.name, e.date, e.location, e.description,
+           COALESCE(json_group_array(json_object('id', t.id, 'name', t.name)), '[]') as tags
+    FROM events e
+    LEFT JOIN event_tags et ON e.id = et.eventId
+    LEFT JOIN tags t ON et.tagId = t.id
+    WHERE e.id = ?
+    GROUP BY e.id
+  `).get(req.params.id);
+
+    res.json({ ...updatedEvent, tags: JSON.parse(updatedEvent.tags) });
 });
 
-// Delete an event by ID (admin only)
+// Delete event endpoint
 app.delete('/api/events/:id', authenticateToken, authorizeAdmin, (req, res) => {
-    const eventId = parseInt(req.params.id);
-    const eventIndex = events.findIndex(e => e.id === eventId);
+    const event = db.prepare('SELECT * FROM events WHERE id = ?').get(req.params.id);
+    if (!event) return res.status(404).json({ error: 'Event not found' });
 
-    if (eventIndex === -1) {
-        return res.status(404).json({ error: 'Event not found' });
-    }
-
-    events.splice(eventIndex, 1);
+    db.prepare('DELETE FROM events WHERE id = ?').run(req.params.id);
     res.status(204).end();
-});
-
-// Start the server
-app.listen(port, () => {
-    console.log(`Event API server running at http://localhost:${port}`);
 });
 
 export default app;

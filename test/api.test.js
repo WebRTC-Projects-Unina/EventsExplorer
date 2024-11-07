@@ -2,27 +2,24 @@ import { use, expect } from 'chai';
 import chaiHttp from 'chai-http';
 import app from '../server.js';
 import supertest from 'supertest';
+import db from '../database.js';
 
 const chai = use(chaiHttp);
-
-
 const api = supertest(app);
 
-describe('Event API', () => {
+
+describe('Event API with Many-to-Many Tags', () => {
     let adminToken;
     let userToken;
-    let eventId;
+    let eventId1, eventId2, eventId;
 
-    // Helper to authenticate and retrieve tokens for admin and user
     before(async () => {
-        // Login as admin
-        const adminLogin = await api.post('/api/login')
-            .send({ username: 'admin', password: 'adminpass' });
+        db.exec('DELETE FROM events; DELETE FROM tags; DELETE FROM event_tags;');
+
+        const adminLogin = await api.post('/api/login').send({ username: 'admin', password: 'adminpass' });
         adminToken = adminLogin.body.token;
 
-        // Login as normal user
-        const userLogin = await api.post('/api/login')
-            .send({ username: 'user', password: 'userpass' });
+        const userLogin = await api.post('/api/login').send({ username: 'user', password: 'userpass' });
         userToken = userLogin.body.token;
     });
 
@@ -140,5 +137,50 @@ describe('Event API', () => {
             expect(anonRes.body.name).to.equal('Public Event');
 
         });
+    });
+
+    it('should allow admin to create multiple events with shared tags', async () => {
+        const techTag = { name: 'Tech' };
+        const confTag = { name: 'Conference' };
+
+        const event1 = await api.post('/api/events')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({
+                name: 'Tech Conference 1',
+                date: '2024-12-01',
+                location: 'Berlin',
+                description: 'Annual tech event 1',
+                tags: [techTag, confTag]
+            });
+
+        const event2 = await api.post('/api/events')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({
+                name: 'Tech Conference 2',
+                date: '2024-12-02',
+                location: 'Paris',
+                description: 'Annual tech event 2',
+                tags: [techTag]
+            });
+
+        eventId1 = event1.body.id;
+        eventId2 = event2.body.id;
+
+        expect(event1.status).to.equal(201);
+        expect(event1.body.tags).to.have.lengthOf(2);
+        expect(event2.status).to.equal(201);
+        expect(event2.body.tags).to.have.lengthOf(1);
+    });
+
+    it('should retrieve events with shared tags', async () => {
+        const res = await api.get(`/api/events`).set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.status).to.equal(200);
+        const event1 = res.body.find(e => e.id === eventId1);
+        const event2 = res.body.find(e => e.id === eventId2);
+
+        expect(event1.tags.some(tag => tag.name === 'Tech')).to.be.true;
+        expect(event2.tags.some(tag => tag.name === 'Tech')).to.be.true;
+        expect(event1.tags.some(tag => tag.name === 'Conference')).to.be.true;
     });
 });
