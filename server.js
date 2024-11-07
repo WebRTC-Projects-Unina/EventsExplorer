@@ -1,6 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-
+import users from './models/user.js';
 const app = express();
 const port = 3000;
 
@@ -13,11 +13,7 @@ const JWT_SECRET = 'your_secret_key';
 let events = [];
 let eventId = 1;
 
-// Mock users (in a real application, store users securely in a database)
-const users = [
-    { id: 1, username: 'admin', password: 'adminpass', role: 'admin' },
-    { id: 2, username: 'user', password: 'userpass', role: 'user' }
-];
+
 
 // Middleware to authenticate requests
 function authenticateToken(req, res, next) {
@@ -41,6 +37,14 @@ function authorizeAdmin(req, res, next) {
     next();
 }
 
+// Helper function to validate and assign tag IDs
+function createTags(tags) {
+    return tags.map(tag => ({
+        id: tagId++,
+        name: tag.name
+    }));
+}
+
 // Login route to get a token
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
@@ -59,7 +63,7 @@ app.post('/api/login', (req, res) => {
 
 // Create a new event (admin only)
 app.post('/api/events', authenticateToken, authorizeAdmin, (req, res) => {
-    const { name, date, location, description } = req.body;
+    const { name, date, location, description, tags } = req.body;
 
     if (!name || !date || !location) {
         return res.status(400).json({ error: 'Name, date, and location are required' });
@@ -70,7 +74,8 @@ app.post('/api/events', authenticateToken, authorizeAdmin, (req, res) => {
         name,
         date,
         location,
-        description
+        description,
+        tags: tags ? createTags(tags) : []
     };
 
     events.push(newEvent);
@@ -97,7 +102,7 @@ app.get('/api/events/:id', (req, res) => {
 // Update an existing event by ID (admin only)
 app.put('/api/events/:id', authenticateToken, authorizeAdmin, (req, res) => {
     const eventId = parseInt(req.params.id);
-    const { name, date, location, description } = req.body;
+    const { name, date, location, description, tags } = req.body;
 
     const event = events.find(e => e.id === eventId);
 
@@ -109,7 +114,7 @@ app.put('/api/events/:id', authenticateToken, authorizeAdmin, (req, res) => {
     if (date) event.date = date;
     if (location) event.location = location;
     if (description) event.description = description;
-
+    if (tags) event.tags = createTags(tags);
     res.json(event);
 });
 
