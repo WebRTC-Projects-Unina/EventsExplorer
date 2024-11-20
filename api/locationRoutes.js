@@ -1,7 +1,7 @@
 // locationRoutes.js
 import express from 'express';
 import db from '../database.js';
-import { authenticateToken, authorizeAdmin } from '../authorization.js';
+import { authenticateToken, authorizeAdmin } from '../middleware/authorization.js';
 
 const locationRouter = express.Router();
 
@@ -52,4 +52,4 @@ locationRouter.delete('/:id', authenticateToken, authorizeAdmin, (req, res) => {
     res.status(204).end();
 });
 
-export default locationRouter;
+//export default locationRouter;

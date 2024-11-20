@@ -1,7 +1,7 @@
 import users from '../models/user.js';
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../authorization.js';
+import { JWT_SECRET } from '../middleware/authorization.js';
 
 const loginRouter = express.Router();
 
