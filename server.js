@@ -1,7 +1,7 @@
 // server.js
 import express from 'express';
 import eventRouter from './routes/eventRoutes.js';
-//import locationRouter from './api/locationRoutes.js';
+import locationRouter from './routes/locationRoutes.js';
 import loginRouter from './routes/loginRoutes.js';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
@@ -38,7 +38,7 @@ app.use(errorHandler);
 // Use routers for events and locations
 app.use('/api/login', loginRouter);
 app.use('/api/events', eventRouter);
-// app.use('/api/locations', locationRouter);
+app.use('/api/locations', locationRouter);
 
 // * Rolling Log
 let layoutConfig = {

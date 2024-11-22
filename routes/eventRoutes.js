@@ -60,6 +60,8 @@ eventRouter.post('/', authenticateToken, authorizeAdmin, asyncHandler(async (req
 // @desc    update event by id
 // @access  restricted
 eventRouter.put('/:id', authenticateToken, authorizeAdmin, asyncHandler(async (req, res) => {
+
+    const { id } = req.params;
     log.info(`PUT ${id}`);
 
     const errors = validationResult(req);
