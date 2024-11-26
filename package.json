@@ -11,12 +11,12 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@sequelize/sqlite3": "^7.0.0-alpha.43",
     "better-sqlite3": "^11.5.0",
     "compression": "^1.7.5",
     "connect-session-sequelize": "^7.1.7",
     "cors": "^2.8.5",
     "dayjs": "^1.11.13",
-    "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "express-async-handler": "^1.2.0",
     "express-paginate": "^1.0.2",
@@ -35,6 +35,7 @@
   "devDependencies": {
     "chai": "^5.1.2",
     "chai-http": "^5.1.1",
+    "dotenv": "^16.4.5",
     "mocha": "^10.8.2",
     "nodemon": "3.1.7",
     "supertest": "^7.0.0"

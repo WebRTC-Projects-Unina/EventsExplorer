@@ -1,23 +1,14 @@
 import log4js from 'log4js';
+import * as eventRepository from '../repositories/event.repository.js';
+
 const log = log4js.getLogger("service:event");
 log.level = "debug";
 
 
 async function getEvents(body) {
-    const data = [{
-        id: 1,
-        name: "test",
-        locationId: 1,
-        description: "bla"
-    },
-    {
-        id: 1,
-        name: "test",
-        locationId: 1,
-        description: "bla"
-    }];
-    await new Promise(r => setTimeout(r, 2000));
+    const data = eventRepository.getEvents(body);
     return data;
+
 }
 
 async function getEventById(id) {

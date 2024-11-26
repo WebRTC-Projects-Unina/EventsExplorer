@@ -1,0 +1,38 @@
+[
+    {
+        "name": "Proberaum Scheibbs",
+        "latitude": 48.008387023473816,
+        "longitude": 15.1647447711645,
+        "website": "https://www.proberaumscheibbs.com/"
+    },
+    {
+        "name": "Sturmfrei",
+        "latitude": 48.23496058284176,
+        "longitude": 14.745081092992308,
+        "website": "https://www.foerderbandl.at/"
+    },
+    {
+        "name": "Schlosserei Weyer",
+        "latitude": 48.16904417359611,
+        "longitude": 14.678438302950324,
+        "website": "https://www.facebook.com/schlossereiweyer"
+    },
+    {
+        "name": "Berthold Saal Weyer",
+        "latitude": 47.859617535258714,
+        "longitude": 14.677247436416557,
+        "website": "https://www.bertholdsaal.at/"
+    },
+    {
+        "name": "Böllerbauer",
+        "latitude": 48.10065200594819,
+        "longitude": 14.563818483553929,
+        "website": "http://www.boellerbauer.at/"
+    },
+    {
+        "name": "Schloss Rothschild",
+        "latitude": 47.963139360730814,
+        "longitude": 14.773890969854284,
+        "website": "https://schloss-rothschild.at/"
+    }
+]

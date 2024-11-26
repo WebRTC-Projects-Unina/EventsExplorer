@@ -11,12 +11,12 @@ import hpp from 'hpp';
 import cors from 'cors';
 import dayjs from 'dayjs';
 import paginate from 'express-paginate';
+import sequelize from './database.js';
 import compression from 'compression';
 import { errorHandler } from './middleware/errorHandler.js';
+
 const log = log4js.getLogger("entrypoint");
 log.level = "info";
-
-dotenv.config();
 
 const app = express();
 const port = 3000;

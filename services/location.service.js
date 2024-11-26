@@ -1,36 +1,16 @@
 import log4js from 'log4js';
+import * as locationRepository from '../repositories/location.repository.js';
 const log = log4js.getLogger("service:Location");
 log.level = "debug";
 
 
 async function getLocations(body) {
-    const data = [{
-        id: 1,
-        name: "Schuppen",
-        latitude: 50.934977,
-        longitude: 10.919037,
-        website: "http://hello-world.com"
-    },
-    {
-        id: 2,
-        name: "Werk",
-        latitude: 50.934977,
-        longitude: 10.919037,
-        website: "http://hello-world.com"
-    }];
-    await new Promise(r => setTimeout(r, 2000));
+    const data = locationRepository.getLocations(body);
     return data;
 }
 
 async function getLocationById(id) {
-    const data = {
-        id: 1,
-        name: "Schuppen",
-        latitude: 50.934977,
-        longitude: 10.919037,
-        website: "http://hello-world.com"
-    };
-    await new Promise(r => setTimeout(r, 2000));
+    const data = await locationRepository.getLocationById(id);
     return data;
 }
 
