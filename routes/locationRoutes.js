@@ -24,12 +24,7 @@ locationRouter.get('/', asyncHandler(async (req, res, next) => {
 locationRouter.get('/:id', asyncHandler(async (req, res) => {
     const { id } = req.params;
     log.info(`GET ${id}`);
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return next(
-            new ErrorResponse(errors.array({ onlyFirstError: true })[0].msg, 400)
-        );
-    }
+
     const location = await locationService.getLocationById(id);
     res.status(200).json({
         ...location
@@ -41,19 +36,16 @@ locationRouter.get('/:id', asyncHandler(async (req, res) => {
 // @access  restricted
 locationRouter.post('/', authenticateToken, authorizeAdmin, asyncHandler(async (req, res, next) => {
     log.info("POST");
-    //todo move validator in own file
-    const { name, latitude, longitude, website } = req.body;
-    if (!name || latitude == null || longitude == null) {
-        return res.status(400).json({ error: 'Name, latitude, and longitude are required' });
+
+    try {
+        const newlocation = await locationService.addLocation(req.body);
+        return res.status(201).json(newlocation);
+    } catch (error) {
+        if (error instanceof (ValidationError)) {
+            return res.status(422).json({ error: error.message });
+        }
+        return res.status(500).json({ error: error.message });
     }
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return next(
-            new ErrorResponse(errors.array({ onlyFirstError: true })[0].msg, 400)
-        );
-    }
-    const newlocation = await locationService.addLocation(req.body);
-    res.status(201).json(newlocation);
 }));
 
 
@@ -62,15 +54,7 @@ locationRouter.post('/', authenticateToken, authorizeAdmin, asyncHandler(async (
 // @access  restricted
 locationRouter.put('/:id', authenticateToken, authorizeAdmin, asyncHandler(async (req, res) => {
     const { id } = req.params;
-
     log.info(`PUT ${id}`);
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return next(
-            new ErrorResponse(errors.array({ onlyFirstError: true })[0].msg, 400)
-        );
-    }
 
     // * check valid id
     const isValid = await locationService.getLocationById(id);
@@ -89,13 +73,6 @@ locationRouter.put('/:id', authenticateToken, authorizeAdmin, asyncHandler(async
 locationRouter.delete('/:id', authenticateToken, authorizeAdmin, asyncHandler(async (req, res) => {
     const { id } = req.params;
     log.info(`DELETE ${id}`);
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return next(
-            new ErrorResponse(errors.array({ onlyFirstError: true })[0].msg, 400)
-        );
-    }
 
     // * check valid id
     const isValid = await locationService.getLocationById(id);

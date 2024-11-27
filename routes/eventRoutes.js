@@ -4,6 +4,7 @@ import log4js from 'log4js';
 import * as eventService from '../services/event.service.js';
 import asyncHandler from 'express-async-handler';
 import { validationResult } from 'express-validator';
+import { ErrorResponse, ValidationError } from '../middleware/errorHandler.js';
 const log = log4js.getLogger("event route");
 const eventRouter = express.Router();
 
@@ -22,16 +23,17 @@ eventRouter.get('/', asyncHandler(async (req, res, next) => {
 eventRouter.get('/:id', asyncHandler(async (req, res) => {
     const { id } = req.params;
     log.info(`GET ${id}`);
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return next(
-            new ErrorResponse(errors.array({ onlyFirstError: true })[0].msg, 400)
-        );
-    }
+
     const event = await eventService.getEventById(id);
-    res.status(200).json({
-        ...event
-    });
+    if (event != null) {
+        res.status(200).json({
+            ...event
+        });
+    }
+    else {
+        res.status(404).end();
+    }
+
 }));
 
 // * @route POST /api/events
@@ -39,21 +41,19 @@ eventRouter.get('/:id', asyncHandler(async (req, res) => {
 // @access  restricted
 eventRouter.post('/', authenticateToken, authorizeAdmin, asyncHandler(async (req, res, next) => {
     log.info("POST");
+    try {
+        const newEvent = await eventService.addEvent(req.body);
+        return res.status(201).json(newEvent);
 
-    const { name, date, locationId, description, tags } = req.body;
+    } catch (error) {
+        if (error instanceof (ValidationError)) {
+            // return next(error.message, 422);
+            return res.status(422).json({ error: error.message });
 
-    //todo move validator in own file
-    if (!name || !date || !locationId) {
-        return res.status(400).json({ error: 'Name, date, and locationId are required' });
+        }
+        console.log(error.message);
+        return res.status(500).json({ error: error.message });
     }
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return next(
-            new ErrorResponse(errors.array({ onlyFirstError: true })[0].msg, 400)
-        );
-    }
-    const newEvent = await eventService.addEvent(req.body);
-    res.status(201).json(newEvent);
 }));
 
 // * @route PUT /api/events/:id
@@ -63,13 +63,6 @@ eventRouter.put('/:id', authenticateToken, authorizeAdmin, asyncHandler(async (r
 
     const { id } = req.params;
     log.info(`PUT ${id}`);
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return next(
-            new ErrorResponse(errors.array({ onlyFirstError: true })[0].msg, 400)
-        );
-    }
 
     // * check valid id
     const isValid = await eventService.getEventById(id);
@@ -88,13 +81,6 @@ eventRouter.put('/:id', authenticateToken, authorizeAdmin, asyncHandler(async (r
 eventRouter.delete('/:id', authenticateToken, authorizeAdmin, asyncHandler(async (req, res) => {
     const { id } = req.params;
     log.info(`DELETE ${id}`);
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return next(
-            new ErrorResponse(errors.array({ onlyFirstError: true })[0].msg, 400)
-        );
-    }
 
     // * check valid id
     const isValid = await eventService.getEventById(id);

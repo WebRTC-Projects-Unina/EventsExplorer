@@ -10,9 +10,6 @@ const Event = (sequelize, Sequelize) => {
         date: {
             type: DataTypes.DATE
         },
-        locationId: {
-            type: DataTypes.INTEGER
-        },
         description: {
             type: DataTypes.STRING
         },

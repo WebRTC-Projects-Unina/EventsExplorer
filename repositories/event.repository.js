@@ -11,4 +11,26 @@ async function getEventById(id) {
     return data;
 }
 
-export { getEvents, getEventById };
+async function addEvent(body) {
+    return await Event.create(body);
+}
+
+async function updateEvent(body, id) {
+    return await Event.update(body, {
+        where: {
+            id: id
+        }
+    });
+}
+
+async function deleteEventById(id) {
+    Event.destroy({
+        where: {
+            id: id
+        }
+    }).then((rowsDeleted) => {
+        console.log("rows deleted:" + rowsDeleted);
+    });
+}
+
+export { getEvents, getEventById, deleteEventById, addEvent, updateEvent };

@@ -10,4 +10,6 @@ db.Sequelize = Sequelize;
 db.Location = Location(sequelize, Sequelize);
 db.Event = Event(sequelize, Sequelize);
 
+db.Event.Location = db.Event.belongsTo(db.Location, { foreignKey: "locationId" });
+
 export default db;

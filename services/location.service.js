@@ -15,21 +15,29 @@ async function getLocationById(id) {
 }
 
 async function deleteLocationById(id) {
-    const data = null;
-    await new Promise(r => setTimeout(r, 2000));
-    return data;
+    return await locationRepository.deleteLocationById(id);
 }
 
 async function addLocation(body) {
-    const data = null;
-    await new Promise(r => setTimeout(r, 2000));
-    return data;
+    validateLocation(body);
+    return await locationRepository.addLocation(body);
 }
 
 async function updateLocation(body, id) {
-    const data = null;
-    await new Promise(r => setTimeout(r, 2000));
-    return data;
+    return await locationRepository.updateLocation(body, id);
+}
+
+function validateLocation(body) {
+
+    if (!body.name) {
+        throw new ValidationError("Name is missing");
+    }
+    if (!body.latitude) {
+        throw new ValidationError("Latitude is missing.");
+    }
+    if (!body.longitude) {
+        throw new ValidationError("Longitude is missing");
+    }
 }
 
 export { updateLocation, addLocation, getLocationById, deleteLocationById, getLocations };

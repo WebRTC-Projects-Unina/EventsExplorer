@@ -1,11 +1,8 @@
 import db from "../models/index.js";
-import DummyLocations from "../config/locations.json" with { type: "json" };
 
 const Location = db.Location;
 
 async function getLocations(body) {
-    console.log(DummyLocations[0].name);
-    await Location.create(DummyLocations[0]);
     const data = await Location.findAll(body);
     return data;
 }
@@ -15,4 +12,23 @@ async function getLocationById(id) {
     return data;
 }
 
-export { getLocations, getLocationById };
+async function addLocation(body) {
+    return await Location.create(body);
+}
+
+async function updateLocation(body, id) {
+
+    return await Location.update(body, {
+        where: { id: id }
+    });
+}
+
+async function deleteLocationById(id) {
+    return await Location.destroy({
+        where: {
+            id: id
+        }
+    });
+}
+
+export { getLocations, getLocationById, addLocation, updateLocation, deleteLocationById };

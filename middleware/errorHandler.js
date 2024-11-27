@@ -14,6 +14,12 @@ class ErrorResponse extends Error {
     }
 }
 
+class ValidationError extends Error {
+    constructor(message) {
+        super(message);
+    }
+}
+
 const errorHandler = (err, req, res, next) => {
     let error = { ...err };
     error.message = err.message;
@@ -35,4 +41,4 @@ const errorHandler = (err, req, res, next) => {
     });
 };
 
-export { ErrorResponse, errorHandler };
+export { ErrorResponse, ValidationError, errorHandler };

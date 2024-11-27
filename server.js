@@ -34,11 +34,16 @@ app.use(paginate.middleware(10, 30));
 //Error handler
 app.use(errorHandler);
 
+function validate(req, res, next) {
+    console.log("validate middleware");
+    next();
+}
+
 //Routes
 // Use routers for events and locations
-app.use('/api/login', loginRouter);
-app.use('/api/events', eventRouter);
-app.use('/api/locations', locationRouter);
+app.use('/api/login', validate, loginRouter);
+app.use('/api/events', validate, eventRouter);
+app.use('/api/locations', validate, locationRouter);
 
 // * Rolling Log
 let layoutConfig = {

@@ -1,0 +1,122 @@
+[
+    {
+        "name": "Rock Fest 2024",
+        "description": "A thrilling night of rock music.",
+        "date": "2024-11-30T19:00:00",
+        "locationId": 1
+    },
+    {
+        "name": "Neon Glow Party",
+        "description": "Dance under neon lights all night.",
+        "date": "2024-12-01T22:30:00",
+        "locationId": 2
+    },
+    {
+        "name": "Jazz Night Live",
+        "description": "Smooth jazz by top musicians.",
+        "date": "2024-12-02T20:00:00",
+        "locationId": 3
+    },
+    {
+        "name": "EDM Rave Extravaganza",
+        "description": "An energetic night of electronic beats.",
+        "date": "2024-12-03T23:00:00",
+        "locationId": 4
+    },
+    {
+        "name": "Indie Vibes Festival",
+        "description": "Showcasing the best indie bands.",
+        "date": "2024-12-04T18:30:00",
+        "locationId": 5
+    },
+    {
+        "name": "Latin Fiesta Night",
+        "description": "Dance to the rhythms of Latin music.",
+        "date": "2024-12-05T21:00:00",
+        "locationId": 6
+    },
+    {
+        "name": "Hip-Hop Showcase",
+        "description": "Top hip-hop artists perform live.",
+        "date": "2024-12-06T20:45:00",
+        "locationId": 1
+    },
+    {
+        "name": "Country Roads Concert",
+        "description": "Enjoy heartfelt country music.",
+        "date": "2024-12-07T19:15:00",
+        "locationId": 2
+    },
+    {
+        "name": "Classical Evening Gala",
+        "description": "A night of timeless classical pieces.",
+        "date": "2024-12-08T18:00:00",
+        "locationId": 3
+    },
+    {
+        "name": "K-Pop Sensation Night",
+        "description": "Experience the best of K-pop live.",
+        "date": "2024-12-09T20:30:00",
+        "locationId": 4
+    },
+    {
+        "name": "Retro 80s Party",
+        "description": "Relive the 80s with classic hits.",
+        "date": "2024-12-10T21:45:00",
+        "locationId": 5
+    },
+    {
+        "name": "Soulful Sundays",
+        "description": "Relax with soulful melodies.",
+        "date": "2024-12-11T17:00:00",
+        "locationId": 6
+    },
+    {
+        "name": "Metal Mania",
+        "description": "A night of intense metal music.",
+        "date": "2024-12-12T19:30:00",
+        "locationId": 1
+    },
+    {
+        "name": "Acoustic Night",
+        "description": "Stripped-down performances by great artists.",
+        "date": "2024-12-13T20:15:00",
+        "locationId": 2
+    },
+    {
+        "name": "DJ Night Bash",
+        "description": "Top DJs spinning all night.",
+        "date": "2024-12-14T22:00:00",
+        "locationId": 3
+    },
+    {
+        "name": "Blues & Brews Festival",
+        "description": "Blues music paired with craft brews.",
+        "date": "2024-12-15T16:30:00",
+        "locationId": 4
+    },
+    {
+        "name": "Folk Fest Celebration",
+        "description": "A celebration of folk traditions and music.",
+        "date": "2024-12-16T18:45:00",
+        "locationId": 5
+    },
+    {
+        "name": "Punk Rock Night",
+        "description": "High-energy punk rock performances.",
+        "date": "2024-12-17T20:30:00",
+        "locationId": 6
+    },
+    {
+        "name": "Silent Disco Experience",
+        "description": "Dance with wireless headphones.",
+        "date": "2024-12-18T22:15:00",
+        "locationId": 1
+    },
+    {
+        "name": "New Year’s Eve Gala",
+        "description": "Ring in the new year with style and music.",
+        "date": "2024-12-31T23:59:00",
+        "locationId": 2
+    }
+]
