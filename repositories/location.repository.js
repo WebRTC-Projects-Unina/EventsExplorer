@@ -1,4 +1,6 @@
 import db from "../models/index.js";
+import log4js from 'log4js';
+const log = log4js.getLogger("location repository");
 
 const Location = db.Location;
 
@@ -28,6 +30,10 @@ async function deleteLocationById(id) {
         where: {
             id: id
         }
+    }).then((rowsDeleted) => {
+        log.info("rows deleted: " + rowsDeleted);
+    }).catch((error) => {
+        throw new NotFoundError(error);
     });
 }
 

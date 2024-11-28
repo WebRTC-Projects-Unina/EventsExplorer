@@ -3,8 +3,7 @@ import { authenticateToken, authorizeAdmin } from '../middleware/authorization.j
 import log4js from 'log4js';
 import * as eventService from '../services/event.service.js';
 import asyncHandler from 'express-async-handler';
-import { validationResult } from 'express-validator';
-import { ErrorResponse, ValidationError } from '../middleware/errorHandler.js';
+import { NotFoundError, ValidationError } from '../middleware/errorHandler.js';
 const log = log4js.getLogger("event route");
 const eventRouter = express.Router();
 
@@ -30,9 +29,9 @@ eventRouter.get('/:id', asyncHandler(async (req, res) => {
             ...event
         });
     }
-    else {
-        res.status(404).end();
-    }
+    const error = new NotFoundError(id);
+    return res.status(400).json({ error: error.message });
+
 
 }));
 
@@ -47,11 +46,8 @@ eventRouter.post('/', authenticateToken, authorizeAdmin, asyncHandler(async (req
 
     } catch (error) {
         if (error instanceof (ValidationError)) {
-            // return next(error.message, 422);
             return res.status(422).json({ error: error.message });
-
         }
-        console.log(error.message);
         return res.status(500).json({ error: error.message });
     }
 }));
@@ -67,7 +63,8 @@ eventRouter.put('/:id', authenticateToken, authorizeAdmin, asyncHandler(async (r
     // * check valid id
     const isValid = await eventService.getEventById(id);
     if (!isValid) {
-        return next(new ErrorResponse("invalid id", 400));
+        const error = new NotFoundError(id);
+        return res.status(400).json({ error: error.message });
     }
 
     // * call update service
@@ -78,14 +75,15 @@ eventRouter.put('/:id', authenticateToken, authorizeAdmin, asyncHandler(async (r
 // * @route DELETE /api/events/:id
 // @desc    delete event by id
 // @access  restricted
-eventRouter.delete('/:id', authenticateToken, authorizeAdmin, asyncHandler(async (req, res) => {
+eventRouter.delete('/:id', authenticateToken, authorizeAdmin, asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     log.info(`DELETE ${id}`);
 
     // * check valid id
     const isValid = await eventService.getEventById(id);
     if (!isValid) {
-        return next(new ErrorResponse("invalid id", 400));
+        const error = new NotFoundError(id);
+        return res.status(400).json({ error: error.message });
     }
     await eventService.deleteEventById(id);
     res.status(204).end();

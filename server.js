@@ -12,6 +12,7 @@ import cors from 'cors';
 import dayjs from 'dayjs';
 import paginate from 'express-paginate';
 import sequelize from './database.js';
+import { validate } from './middleware/requestValidator.js';
 import compression from 'compression';
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -33,11 +34,6 @@ app.use(paginate.middleware(10, 30));
 
 //Error handler
 app.use(errorHandler);
-
-function validate(req, res, next) {
-    console.log("validate middleware");
-    next();
-}
 
 //Routes
 // Use routers for events and locations

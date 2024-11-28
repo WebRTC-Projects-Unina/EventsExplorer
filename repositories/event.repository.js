@@ -1,4 +1,8 @@
+import { NotFoundError } from "../middleware/errorHandler.js";
 import db from "../models/index.js";
+import log4js from 'log4js';
+const log = log4js.getLogger("event repository");
+
 const Event = db.Event;
 
 async function getEvents(body) {
@@ -29,7 +33,9 @@ async function deleteEventById(id) {
             id: id
         }
     }).then((rowsDeleted) => {
-        console.log("rows deleted:" + rowsDeleted);
+        log.info("rows deleted: " + rowsDeleted);
+    }).catch((error) => {
+        throw new NotFoundError(error);
     });
 }
 

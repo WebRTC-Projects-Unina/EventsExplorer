@@ -1,13 +1,12 @@
-// locationRoutes.js
 import express from 'express';
 import log4js from 'log4js';
 import asyncHandler from 'express-async-handler';
-import { validationResult } from 'express-validator';
 import * as locationService from '../services/location.service.js';
 import { authenticateToken, authorizeAdmin } from '../middleware/authorization.js';
+import { NotFoundError, ValidationError } from '../middleware/errorHandler.js';
+
 const log = log4js.getLogger("location route");
 const locationRouter = express.Router();
-
 
 // * @route GET /api/locations
 // @desc    get locations
@@ -26,9 +25,13 @@ locationRouter.get('/:id', asyncHandler(async (req, res) => {
     log.info(`GET ${id}`);
 
     const location = await locationService.getLocationById(id);
-    res.status(200).json({
-        ...location
-    });
+    if (location != null) {
+        res.status(200).json({
+            ...location
+        });
+    }
+    const error = new NotFoundError(id);
+    return res.status(400).json({ error: error.message });
 }));
 
 // * @route POST /api/locations
@@ -59,7 +62,9 @@ locationRouter.put('/:id', authenticateToken, authorizeAdmin, asyncHandler(async
     // * check valid id
     const isValid = await locationService.getLocationById(id);
     if (!isValid) {
-        return next(new ErrorResponse("invalid id", 400));
+        const error = new NotFoundError(id);
+        return res.status(400).json({ error: error.message });
+
     }
 
     // * call update service
@@ -77,7 +82,8 @@ locationRouter.delete('/:id', authenticateToken, authorizeAdmin, asyncHandler(as
     // * check valid id
     const isValid = await locationService.getLocationById(id);
     if (!isValid) {
-        return next(new ErrorResponse("invalid id", 400));
+        const error = new NotFoundError(id);
+        return res.status(400).json({ error: error.message });
     }
     await locationService.deleteLocationById(id);
     res.status(204).end();

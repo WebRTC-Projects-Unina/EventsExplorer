@@ -20,6 +20,12 @@ class ValidationError extends Error {
     }
 }
 
+class NotFoundError extends Error {
+    constructor(id) {
+        super("Entity not found with id: " + id);
+    }
+}
+
 const errorHandler = (err, req, res, next) => {
     let error = { ...err };
     error.message = err.message;
@@ -41,4 +47,4 @@ const errorHandler = (err, req, res, next) => {
     });
 };
 
-export { ErrorResponse, ValidationError, errorHandler };
+export { ErrorResponse, ValidationError, NotFoundError, errorHandler };
