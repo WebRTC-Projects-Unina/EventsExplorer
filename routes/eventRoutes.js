@@ -12,7 +12,7 @@ const eventRouter = express.Router();
 // @access  public
 eventRouter.get('/', asyncHandler(async (req, res, next) => {
     log.info("GET");
-    const events = await eventService.getEvents();
+    const events = await eventService.getEvents(req.body);
     res.json(events);
 }));
 
@@ -69,7 +69,7 @@ eventRouter.put('/:id', authenticateToken, authorizeAdmin, asyncHandler(async (r
 
     // * call update service
     await eventService.updateEvent(req.body, id);
-    res.status(200);
+    res.status(200).end();
 }));
 
 // * @route DELETE /api/events/:id

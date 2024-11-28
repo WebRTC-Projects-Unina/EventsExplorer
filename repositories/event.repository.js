@@ -1,12 +1,32 @@
 import { NotFoundError } from "../middleware/errorHandler.js";
 import db from "../models/index.js";
+import { Op } from 'sequelize';
 import log4js from 'log4js';
 const log = log4js.getLogger("event repository");
 
 const Event = db.Event;
 
 async function getEvents(body) {
-    const data = await Event.findAll(body);
+    let text = body.text ?? '';
+    const search = {
+        where: {
+            [Op.and]: [
+                {
+                    date: {
+                        [Op.gte]: new Date()
+                    },
+                    [Op.or]: {
+                        name: { [Op.like]: '%' + text + '%' },
+                        description: { [Op.like]: '%' + text + '%' }
+                    }
+                }]
+
+        },
+    };
+    if (body.locationId != undefined) {
+        search.where[Op.and].push({ locationId: body.locationId });
+    }
+    const data = await Event.findAll(search);
     return data;
 }
 
