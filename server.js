@@ -16,7 +16,13 @@ import sequelize from './database.js';
 import { validate } from './middleware/requestValidator.js';
 import compression from 'compression';
 import { errorHandler } from './middleware/errorHandler.js';
+import imageRouter from './routes/imageRoutes.js';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import path from 'path';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const log = log4js.getLogger("entrypoint");
 log.level = "info";
 
@@ -42,6 +48,8 @@ app.use('/api/login', validate, loginRouter);
 app.use('/api/events', validate, eventRouter);
 app.use('/api/locations', validate, locationRouter);
 app.use('/api/tags', validate, tagRouter);
+app.use('/api/images', validate, imageRouter);
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // * Rolling Log
 let layoutConfig = {

@@ -3,6 +3,7 @@ import { authenticateToken, authorizeAdmin } from '../middleware/authorization.j
 import log4js from 'log4js';
 import * as eventService from '../services/event.service.js';
 import asyncHandler from 'express-async-handler';
+import * as imageService from '../services/image.service.js';
 import { NotFoundError, ValidationError } from '../middleware/errorHandler.js';
 const log = log4js.getLogger("event route");
 const eventRouter = express.Router();
@@ -42,6 +43,7 @@ eventRouter.post('/', authenticateToken, authorizeAdmin, asyncHandler(async (req
     log.info("POST");
     try {
         const newEvent = await eventService.addEvent(req.body);
+
         return res.status(201).json(newEvent);
 
     } catch (error) {

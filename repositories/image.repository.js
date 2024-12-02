@@ -1,28 +1,26 @@
 import { NotFoundError } from "../middleware/errorHandler.js";
 import db from "../models/index.js";
-import { Op } from 'sequelize';
 import log4js from 'log4js';
-const log = log4js.getLogger("User repository");
+const log = log4js.getLogger("Image repository");
+const Image = db.Image;
 
-const User = db.User;
-
-async function getUser(body) {
+async function getImage(body) {
     const search = {
         where: {
-            username: body.username,
+            Imagename: body.Imagename,
             password: body.password
         }
     };
 
-    const data = await User.findOne(search);
+    const data = await Image.findOne(search);
     return data;
 }
 
-async function addUser(body) {
-    return await User.create(body);
+async function addImage(body) {
+    return await Image.create(body);
 }
-async function deleteUserById(id) {
-    return await User.destroy({
+async function deleteImageById(id) {
+    return await Image.destroy({
         where: {
             id: id
         }
@@ -32,4 +30,4 @@ async function deleteUserById(id) {
         throw new NotFoundError(error);
     });
 }
-export { getUser, addUser, deleteUserById };
+export { getImage, addImage, deleteImageById };

@@ -24,7 +24,7 @@ async function getEvents(body) {
                 }]
 
         },
-        include: [db.Location, db.Tag]
+        include: [db.Location, db.Tag, db.Image]
     };
     if (body.locationId != undefined) {
         search.where[Op.and].push({ locationId: body.locationId });
@@ -47,7 +47,8 @@ async function getEventById(id) {
             model: db.Tag, attributes: ['id', 'name'], through: {
                 attributes: []
             }
-        }]
+        },
+        { model: db.Image, attributes: ['filename'] }]
     });
     return data.toJSON();
 }

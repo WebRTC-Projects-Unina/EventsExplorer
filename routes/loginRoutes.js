@@ -9,6 +9,7 @@ const loginRouter = express.Router();
 loginRouter.post('/', asyncHandler(async (req, res, next) => {
 
     const user = await userRepository.getUser(req.body);
+
     if (!user) {
         return res.status(400).json({ error: 'Invalid username or password' });
     }
