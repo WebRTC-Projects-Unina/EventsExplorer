@@ -22,7 +22,7 @@ async function deleteEventById(id) {
 }
 
 async function addEvent(body) {
-    validateEvent();
+    validateEvent(body);
     return await eventRepository.addEvent(body);
 }
 

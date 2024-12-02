@@ -25,7 +25,7 @@ eventRouter.get('/:id', asyncHandler(async (req, res) => {
 
     const event = await eventService.getEventById(id);
     if (event != null) {
-        res.status(200).json({
+        return res.status(200).json({
             ...event
         });
     }
@@ -45,6 +45,7 @@ eventRouter.post('/', authenticateToken, authorizeAdmin, asyncHandler(async (req
         return res.status(201).json(newEvent);
 
     } catch (error) {
+        console.log(error);
         if (error instanceof (ValidationError)) {
             return res.status(422).json({ error: error.message });
         }

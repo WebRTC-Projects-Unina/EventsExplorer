@@ -3,6 +3,7 @@ import express from 'express';
 import eventRouter from './routes/eventRoutes.js';
 import locationRouter from './routes/locationRoutes.js';
 import loginRouter from './routes/loginRoutes.js';
+import tagRouter from './routes/tagRoutes.js';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import log4js from 'log4js';
@@ -40,6 +41,7 @@ app.use(errorHandler);
 app.use('/api/login', validate, loginRouter);
 app.use('/api/events', validate, eventRouter);
 app.use('/api/locations', validate, locationRouter);
+app.use('/api/tags', validate, tagRouter);
 
 // * Rolling Log
 let layoutConfig = {
