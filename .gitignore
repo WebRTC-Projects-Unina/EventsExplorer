@@ -46,5 +46,5 @@ Thumbs.db
 *.log.*
 *.sqlite
 *.env
-/images
+/assets/images
 *.sqlite-journal

@@ -20,6 +20,7 @@ import imageRouter from './routes/imageRoutes.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
+import subscribeRouter from './routes/subscribeRoute.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -49,7 +50,10 @@ app.use('/api/events', validate, eventRouter);
 app.use('/api/locations', validate, locationRouter);
 app.use('/api/tags', validate, tagRouter);
 app.use('/api/images', validate, imageRouter);
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/images', express.static(path.join(__dirname, 'assets/images')));
+app.use('/api/subscribe', validate, subscribeRouter);
+
+
 
 // * Rolling Log
 let layoutConfig = {
@@ -83,8 +87,6 @@ log4js.configure({
         default: { appenders: ["app", "console"], level: "debug" },
     },
 });
-
-
 
 app.listen(port, (err) => {
     if (err) {

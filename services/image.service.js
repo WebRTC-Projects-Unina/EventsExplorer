@@ -4,7 +4,7 @@ import * as imageRepository from '../repositories/image.repository.js';
 
 const multerStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, './images');
+        cb(null, './assets/images');
     },
     filename: (req, file, cb) => {
         cb(null, `image-${Date.now()}` + path.extname(file.originalname))
