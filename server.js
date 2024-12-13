@@ -33,7 +33,11 @@ const port = 3000;
 //Security, Compression & Parser
 app.use(helmet());
 app.use(hpp());
-app.use(cors());
+app.use(cors({
+    'allowedHeaders': ['Content-Type'],
+    'origin': '*',
+    'preflightContinue': true
+}));
 app.use(compression());
 app.use(express.json());
 
@@ -50,6 +54,10 @@ app.use('/api/events', validate, eventRouter);
 app.use('/api/locations', validate, locationRouter);
 app.use('/api/tags', validate, tagRouter);
 app.use('/api/images', validate, imageRouter);
+app.use('/images', (_, res, next) => {
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    next();
+});
 app.use('/images', express.static(path.join(__dirname, 'assets/images')));
 app.use('/api/subscribe', validate, subscribeRouter);
 

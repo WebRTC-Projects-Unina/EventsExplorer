@@ -56,14 +56,16 @@ async function getEventById(id) {
 async function addEvent(body) {
 
     return await Event.create(body).then((event) => {
+        if (body.tags != undefined) {
+            body.tags.forEach(tag => {
+                if (tag.id == undefined) {
+                    Tag.create(tag).then(async (tag) => {
+                        await tag.addEvent(event);
+                    });
+                }
+            });
+        }
 
-        body.tags.forEach(tag => {
-            if (tag.id == undefined) {
-                Tag.create(tag).then(async (tag) => {
-                    await tag.addEvent(event);
-                });
-            }
-        });
 
         return event;
     });

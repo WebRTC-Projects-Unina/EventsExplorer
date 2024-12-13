@@ -11,7 +11,7 @@ const multerStorage = multer.diskStorage({
     }
 });
 const multerFilter = (req, file, cb) => {
-    if (!file.originalname.match(/\.(png|jpg)$/)) {
+    if (!file.originalname.match(/\.(png|jpg|gif)$/)) {
         return cb(new Error('Please upload a Image'))
     }
     cb(null, true)
@@ -22,10 +22,12 @@ const upload = multer({
     fileFilter: multerFilter,
     limits: { fileSize: 7 * 1024 * 1024 }
 });
-async function uploadSingleImage(req, res) {
+async function uploadSingleImage(req, res, next) {
+    console.log(req.file.filename);
     const image = { filename: req.file.filename, eventId: req.body.eventId };
     await imageRepository.addImage(image);
-    res.status(200).json({ 'statusCode': 200, 'status': true, message: 'Image added', 'data': [] });
+
+    //res.status(200).json({ 'statusCode': 200, 'status': true, message: 'Image added', 'data': [] });
 
 }
 export { upload, uploadSingleImage };
