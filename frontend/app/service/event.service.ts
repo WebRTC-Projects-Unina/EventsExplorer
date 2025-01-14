@@ -19,6 +19,10 @@ function getEventById(id: Number) {
     return axios.get<Event>(`${baseUrl}${eventUrl}/${id}`);
 }
 
+function updateEvent(event: Event) {
+    return axios.put<Event>(`${baseUrl}${eventUrl}/${event.id}`, event);
+}
+
 function deleteEvent(id: Number) {
 
     return axios.delete(`${baseUrl}${eventUrl}/${id}`);
@@ -32,4 +36,4 @@ function deleteEvent(id: Number) {
     // }
 }
 
-export { getEvents, getEventById, deleteEvent };
+export { getEvents, getEventById, updateEvent, deleteEvent };

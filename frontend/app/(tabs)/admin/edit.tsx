@@ -1,31 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from 'react-native-paper';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { Button, useTheme } from 'react-native-paper';
+import { View, Text, TextInput, StyleSheet, Modal, Pressable } from 'react-native';
 import { useNavigation, useRouter, useLocalSearchParams } from "expo-router";
 import * as EventService from '../../service/event.service';
+import DateTimePicker from 'react-native-ui-datepicker';
+import dayjs from 'dayjs';
+import { MaterialIcons } from '@expo/vector-icons';
+import { Event, Location } from '../../models/event';
 
 export default function EditEvent() {
     const navigation = useNavigation();
-    const router = useRouter();
     const params = useLocalSearchParams();
     const { id } = params;
-    const [event, setEvent] = useState(null);
+    const [event, setEvent] = useState<Event>();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [date, setDate] = useState('');
+    const [date, setDate] = useState(dayjs());
     const [location, setLocation] = useState('');
     const [loading, setLoading] = useState(true);
 
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    const theme = useTheme();
+
+    const toggleVisibility = () => {
+        setIsModalVisible(!isModalVisible);
+    };
+
+    const onDateChanged = (params: any) => {
+        setDate(dayjs(params.date));
+        setIsModalVisible(false);
+    };
     useEffect(() => {
-        // Fetch event details from the API
+
         EventService.getEventById(Number(id))
-            //.then(response => response.data))
             .then(response => {
-                //setEvent(response.data);
+                setEvent(response.data);
                 setName(response.data.name);
                 setDescription(response.data.description);
-                setDate(response.data.date);
-                //setLocation(response.data.location);
+                setDate(dayjs(response.data.date));
                 setLoading(false);
             })
             .catch(error => {
@@ -36,26 +48,48 @@ export default function EditEvent() {
 
     const handleSave = () => {
         console.log(`Name: ${name} description: ${description} date: ${date}`);
-        // Make API call here
-        // fetch('https://api.example.com/events/' + event.id, {
-        //   method: 'PUT',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify({ name, description, date, location }),
-        // })
-        //   .then(response => response.json())
-        //   .then(data => {
-        //     console.log('Success:', data);
-        //     navigation.goBack();
-        //   })
-        //   .catch(error => {
-        //     console.error('Error:', error);
-        //   });
+        if (event != undefined) {
+            event.name = name;
+            event.description = description;
+            event.date = date.toISOString();
+
+            EventService.updateEvent(event)
+                .then(response => {
+                    navigation.goBack();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
     };
 
     return (
         <View style={styles.container}>
+            <Modal animationType="slide" transparent={true} visible={isModalVisible}>
+                <View style={styles.overlay}>
+                    <View style={styles.modalContent}>
+                        <View style={styles.datePickerContainer}>
+                            <View style={styles.closeButton}>
+                                <Pressable onPress={toggleVisibility} >
+                                    <MaterialIcons name="close" color="#000" size={22} />
+                                </Pressable>
+                            </View>
+                            <DateTimePicker
+                                mode="single"
+                                date={date}
+                                firstDayOfWeek={1}
+                                onChange={onDateChanged}
+                                todayContainerStyle={{
+                                    borderWidth: 1,
+                                }}
+                                headerButtonColor={theme?.colors.primary
+                                }
+                                selectedItemColor={theme?.colors.primary}
+                            />
+                        </View>
+                    </View>
+                </View>
+            </Modal>
             <View style={styles.form}>
                 <View style={styles.inputRow}>
                     <Text style={styles.label}>Name:</Text>
@@ -66,7 +100,6 @@ export default function EditEvent() {
                         placeholder="Enter name"
                     />
                 </View>
-
                 <View style={styles.inputRow}>
                     <Text style={styles.label}>Description:</Text>
                     <TextInput
@@ -76,17 +109,10 @@ export default function EditEvent() {
                         placeholder="Enter description"
                     />
                 </View>
-
                 <View style={styles.inputRow}>
                     <Text style={styles.label}>Date:</Text>
-                    <TextInput
-                        style={styles.input}
-                        value={date}
-                        onChangeText={setDate}
-                        placeholder="Enter date"
-                    />
+                    <Text onPress={toggleVisibility} style={styles.input}>{date.format('DD.MM.YYYY')}</Text>
                 </View>
-
                 <View style={styles.inputRow}>
                     <Text style={styles.label}>Location:</Text>
                     <TextInput
@@ -96,7 +122,6 @@ export default function EditEvent() {
                         placeholder="Enter location"
                     />
                 </View>
-
                 <View style={styles.buttonRow}>
                     <Button mode="contained" onPress={handleSave} style={styles.actionButton} >Save</Button>
                     <Button mode="outlined" onPress={() => navigation.goBack()} style={styles.actionButton} >
@@ -104,7 +129,6 @@ export default function EditEvent() {
                     </Button>
                 </View>
             </View>
-
         </View>
     );
 
@@ -154,5 +178,27 @@ const styles = StyleSheet.create({
     },
     actionButton: {
         marginHorizontal: 4,
+    },
+    closeButton: {
+        position: 'absolute',
+        color: 'black',
+        backgroundColor: 'white',
+        top: 0,
+        right: 5,
+        zIndex: 1,
+    },
+    overlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    },
+    modalContent: {
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,1)',
+    },
+    datePickerContainer: {
+        position: 'relative',
+        paddingTop: 20,
     },
 });
