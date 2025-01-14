@@ -15,6 +15,10 @@ function getEvents() {
     // });
 }
 
+function getEventById(id: Number) {
+    return axios.get<Event>(`${baseUrl}${eventUrl}/${id}`);
+}
+
 function deleteEvent(id: Number) {
 
     return axios.delete(`${baseUrl}${eventUrl}/${id}`);
@@ -28,4 +32,4 @@ function deleteEvent(id: Number) {
     // }
 }
 
-export { getEvents, deleteEvent };
+export { getEvents, getEventById, deleteEvent };

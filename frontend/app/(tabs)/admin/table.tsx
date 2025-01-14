@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { DataTable, Button, IconButton } from 'react-native-paper';
-import * as EventService from '../service/event.service';
+import * as EventService from '../../service/event.service';
 import { format } from 'date-fns';
 import Toast from 'react-native-toast-message';
 import { ScrollView } from 'react-native-gesture-handler';
-import { Event, Location } from '../models/event';
+import { Event, Location } from '../../models/event';
+import { router } from 'expo-router';
 
 const EventTable = () => {
     const [events, setEvents] = useState<Event[]>([]);
@@ -13,9 +14,9 @@ const EventTable = () => {
         getEvents();
     }, []);
     const handleEdit = (id: string) => {
-        console.log(`Edit event with ID: ${id}`);
-        Toast.show({ type: 'success', text1: 'Success', text2: `Event with ID: ${id} deleted successfully` });
-
+        // console.log(`Edit event with ID: ${id}`);
+        // Toast.show({ type: 'success', text1: 'Success', text2: `Event with ID: ${id} deleted successfully` });
+        router.push({ pathname: '/(tabs)/admin/edit', params: { id } });
     };
 
     const handleDelete = async (id: string) => {
@@ -36,6 +37,8 @@ const EventTable = () => {
 
     const handleCreate = () => {
         console.log('Create new event');
+        router.push('/(tabs)/admin/edit');
+
     };
     const getEvents = async () => {
 

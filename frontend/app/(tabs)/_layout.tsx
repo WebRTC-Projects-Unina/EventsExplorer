@@ -22,27 +22,28 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="index"
                 options={{
-                    title: 'Home',
+                    title: 'Explore',
                     tabBarIcon: ({ color, focused }) => (
-                        <Ionicons name={focused ? 'home-sharp' : 'home-outline'} color={color} size={24} />
+                        <Ionicons name={focused ? 'search' : 'search-outline'} color={color} size={24} />
                     ),
                 }}
             />
             <Tabs.Screen
                 name="about"
                 options={{
-                    title: 'About',
+                    title: 'Map',
                     tabBarIcon: ({ color, focused }) => (
-                        <Ionicons name={focused ? 'information-circle' : 'information-circle-outline'} color={color} size={24} />
+                        <Ionicons name={focused ? 'compass' : 'compass-outline'} color={color} size={24} />
                     ),
                 }}
             />
             <Tabs.Screen
-                name="table"
+                name="admin"
                 options={{
-                    title: 'Table',
+                    title: 'Admin area',
+                    tabBarLabel: 'Admin',
                     tabBarIcon: ({ color, focused }) => (
-                        <Ionicons name={focused ? 'information-circle' : 'information-circle-outline'} color={color} size={24} />
+                        <Ionicons name={focused ? 'create' : 'create-outline'} color={color} size={24} />
                     ),
                 }}
             />
