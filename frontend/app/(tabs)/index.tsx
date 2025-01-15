@@ -2,8 +2,8 @@ import React, { PropsWithChildren, SetStateAction, useEffect, useState } from "r
 import { Image, type ImageSource } from "expo-image";
 import { Text, View, FlatList, ActivityIndicator, StyleSheet, Modal, Button, TouchableOpacity, Pressable, Dimensions } from "react-native";
 import { format } from 'date-fns';
+import * as EventService from '../service/event.service';
 import { MaterialIcons } from "@expo/vector-icons";
-import Toast from 'react-native-toast-message';
 import { Event, Location } from '../models/event';
 
 type Props = PropsWithChildren<{
@@ -19,9 +19,11 @@ export default function Index() {
     description: '',
     date: '',
     Image: undefined,
-    Location: undefined
+    Location: undefined,
+    locationId: ''
   }
-  const images = "http://localhost:3000/images/";
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
+  const images = API_URL + "/images/";
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState<Event[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
@@ -38,19 +40,14 @@ export default function Index() {
   };
 
   const getEvents = async () => {
-    Toast.show({ type: 'success', text1: 'Success', text2: `Event with ID deleted successfully` });
 
-    try {
-      const response = await fetch('http://localhost:3000/api/events');
-      const json = await response.json();
-      setData(json);
-    }
-    catch (error) {
-      console.error(error);
-    }
-    finally {
+    EventService.getEvents().then((response) => {
+      setData(response.data);
+    }).catch((error) => {
+      console.log(error.response.error);
+    }).finally(() => {
       setLoading(false);
-    }
+    });
   };
   useEffect(() => {
     getEvents();

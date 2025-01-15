@@ -3,29 +3,24 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { DataTable, Button, IconButton } from 'react-native-paper';
 import * as EventService from '../../service/event.service';
 import { format } from 'date-fns';
-import Toast from 'react-native-toast-message';
 import { ScrollView } from 'react-native-gesture-handler';
-import { Event, Location } from '../../models/event';
+import { Event } from '../../models/event';
 import { router } from 'expo-router';
 
 const EventTable = () => {
     const [events, setEvents] = useState<Event[]>([]);
+
     useEffect(() => {
         getEvents();
     }, []);
+
     const handleEdit = (id: string) => {
-        // console.log(`Edit event with ID: ${id}`);
-        // Toast.show({ type: 'success', text1: 'Success', text2: `Event with ID: ${id} deleted successfully` });
         router.push({ pathname: '/(tabs)/admin/edit', params: { id } });
     };
-
     const handleDelete = async (id: string) => {
-
         EventService.deleteEvent(Number(id)).then(() => {
             console.log("successful deleted");
-            Toast.show({ type: 'success', text1: 'Success', text2: `Event with ID: ${id} deleted successfully` });
         }).catch((error) => {
-            Toast.show({ type: 'error', text1: 'Error' + error.response.status, text2: error.response.data.error });
             console.log(error.response.status + ' ' + error.response.data.error);
         });
     };
@@ -41,16 +36,12 @@ const EventTable = () => {
 
     };
     const getEvents = async () => {
-
         EventService.getEvents().then((response) => {
             setEvents(response.data);
         }).catch((error) => {
-            Toast.show({ type: 'error', text1: 'Error' + error.response.status, text2: error.response.data.error });
-
             console.log(error.response.error);
         });
     };
-
 
     return (
         <View style={styles.container}>

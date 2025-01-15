@@ -11,7 +11,8 @@ type Event = {
     description: string,
     date: string,
     Image: ImageFile | undefined,
-    Location: Location | undefined
+    Location: Location | undefined,
+    locationId: string
 };
 
 export { Event, ImageFile, Location };

@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { Button, useTheme } from 'react-native-paper';
 import { View, Text, TextInput, StyleSheet, Modal, Pressable } from 'react-native';
 import { useNavigation, useRouter, useLocalSearchParams } from "expo-router";
 import * as EventService from '../../service/event.service';
+import * as LocationService from '../../service/location.service';
+
 import DateTimePicker from 'react-native-ui-datepicker';
 import dayjs from 'dayjs';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Event, Location } from '../../models/event';
+import { Picker } from '@react-native-picker/picker';
+import Toast from 'react-native-toast-message';
 
 export default function EditEvent() {
     const navigation = useNavigation();
@@ -16,9 +20,9 @@ export default function EditEvent() {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [date, setDate] = useState(dayjs());
-    const [location, setLocation] = useState('');
     const [loading, setLoading] = useState(true);
-
+    const [locations, setLocations] = useState<Location[]>([]);
+    const [selectedLocationId, setSelectedLocationId] = useState('');
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const theme = useTheme();
 
@@ -30,36 +34,76 @@ export default function EditEvent() {
         setDate(dayjs(params.date));
         setIsModalVisible(false);
     };
+    useLayoutEffect(() => {
+        let title = id == undefined ? "Create event" : "Edit event";
+        navigation.setOptions({
+            title
+        });
+    }, [navigation]);
     useEffect(() => {
+        LocationService.getLocations().then(response => {
+            setLocations(response.data);
+        }).then(() => {
+            if (id !== undefined) {
+                EventService.getEventById(Number(id))
+                    .then(response => {
+                        setEvent(response.data);
+                        setName(response.data.name);
+                        setDescription(response.data.description);
+                        setDate(dayjs(response.data.date));
+                        setSelectedLocationId(response.data.Location?.id || '');
+                        setLoading(false);
+                    })
+                    .catch(error => {
+                        setLoading(false);
+                    });
+            }
+            else {
+                const defaultItem: Event = {
+                    id: '',
+                    name: '',
+                    description: '',
+                    date: '',
+                    Image: undefined,
+                    Location: undefined,
+                    locationId: ''
+                }
+                setEvent(defaultItem);
+            }
 
-        EventService.getEventById(Number(id))
-            .then(response => {
-                setEvent(response.data);
-                setName(response.data.name);
-                setDescription(response.data.description);
-                setDate(dayjs(response.data.date));
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('Error fetching event:', error);
-                setLoading(false);
-            });
+        });
     }, [id]);
 
     const handleSave = () => {
-        console.log(`Name: ${name} description: ${description} date: ${date}`);
+
         if (event != undefined) {
             event.name = name;
             event.description = description;
             event.date = date.toISOString();
+            event.Location = locations.find(o => o.id == selectedLocationId);
+            event.locationId = selectedLocationId;
+            console.log(event);
+            if (event.id == undefined || event.id == "") {
+                EventService.createEvent(event)
+                    .then(response => {
+                        Toast.show({
+                            type: 'success',
+                            text1: 'Event successfully created!'
+                        });
+                        navigation.goBack();
+                    })
+                    .catch(error => {
 
-            EventService.updateEvent(event)
-                .then(response => {
-                    navigation.goBack();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+                    });
+            } else {
+                EventService.updateEvent(event)
+                    .then(response => {
+                        navigation.goBack();
+                    })
+                    .catch(error => {
+
+                    });
+            }
         }
     };
 
@@ -115,12 +159,14 @@ export default function EditEvent() {
                 </View>
                 <View style={styles.inputRow}>
                     <Text style={styles.label}>Location:</Text>
-                    <TextInput
-                        style={styles.input}
-                        value={location}
-                        onChangeText={setLocation}
-                        placeholder="Enter location"
-                    />
+                    <Picker
+                        selectedValue={selectedLocationId}
+                        onValueChange={(itemValue) => setSelectedLocationId(itemValue)}
+                        style={styles.input}                    >
+                        {locations.map((location) => (
+                            <Picker.Item key={location.id} label={location.name} value={location.id} />
+                        ))}
+                    </Picker>
                 </View>
                 <View style={styles.buttonRow}>
                     <Button mode="contained" onPress={handleSave} style={styles.actionButton} >Save</Button>
@@ -201,4 +247,5 @@ const styles = StyleSheet.create({
         position: 'relative',
         paddingTop: 20,
     },
+
 });

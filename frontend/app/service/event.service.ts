@@ -1,39 +1,60 @@
 import axios from 'axios';
-import { Event, Location } from '../models/event';
-const baseUrl = 'http://localhost:3000';
-const eventUrl = '/api/events'
+import { Event } from '../models/event';
+import Toast from 'react-native-toast-message';
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+const eventUrl = '/api/events';
+
+// Request interceptor
+axios.interceptors.request.use(
+    (config) => {
+        // TODO set bearer token      
+        return config;
+    },
+    (error) => {
+        Toast.show({
+            type: 'error',
+            text1: error.request?.data?.error
+        });
+        return Promise.reject(error);
+    }
+);
+
+// Response interceptor
+axios.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    async (error) => {
+        // Handle response errors
 
 
-
+        Toast.show({
+            type: 'error',
+            text1: error.response?.status + ' ' + error.response?.data?.error
+        });
+        return Promise.reject(error);
+    }
+);
 
 function getEvents() {
-    // Invoking the get method to perform a GET request
-    return axios.get<Event[]>(`${baseUrl}${eventUrl}`);
-    // axios.get(`${baseUrl}${eventUrl}`).then((response) => {
-    //     console.log(response.data);
-    //     return response.data;
-    // });
+    return axios.get<Event[]>(`${API_URL}${eventUrl}`);
 }
 
 function getEventById(id: Number) {
-    return axios.get<Event>(`${baseUrl}${eventUrl}/${id}`);
+    return axios.get<Event>(`${API_URL}${eventUrl}/${id}`);
+}
+
+function createEvent(event: Event) {
+    return axios.post<Event>(`${API_URL}${eventUrl}`, event);
 }
 
 function updateEvent(event: Event) {
-    return axios.put<Event>(`${baseUrl}${eventUrl}/${event.id}`, event);
+    return axios.put<Event>(`${API_URL}${eventUrl}/${event.id}`, event);
 }
 
 function deleteEvent(id: Number) {
-
-    return axios.delete(`${baseUrl}${eventUrl}/${id}`);
-    // try {
-    //     const response = await axios.delete(`${baseUrl}${eventUrl}/${id}`);
-    //     console.log(`Event with ID: ${id} deleted from backend`, response.data);
-    //     return response.data;
-    // } catch (error) {
-    //     console.error(`Error deleting event with ID: ${id}`, error);
-    //     throw error;
-    // }
+    return axios.delete(`${API_URL}${eventUrl}/${id}`);
 }
 
-export { getEvents, getEventById, updateEvent, deleteEvent };
+export { getEvents, getEventById, createEvent, updateEvent, deleteEvent };
