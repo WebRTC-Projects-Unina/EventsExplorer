@@ -50,11 +50,12 @@ async function getEventById(id) {
         },
         { model: db.Image, attributes: ['filename'] }]
     });
-    return data.toJSON();
+
+    return data;
 }
 
 async function addEvent(body) {
-
+    console.log(body);
     return await Event.create(body).then((event) => {
         if (body.tags != undefined) {
             body.tags.forEach(tag => {
@@ -84,9 +85,10 @@ async function updateEvent(body, id) {
                 EventId: id
             }
         });
-        let currentIds = event_tags.map(o => o.TagId);
+
+        let currentIds = event_tags == null ? new Array() : event_tags?.map(o => o.TagId);
         let currentIdsSet = new Set(currentIds);
-        let newIds = body.tags.map(o => o.id);
+        let newIds = body.tags == null ? new Array() : body.tags.map(o => o.id);
         let newIdsSet = new Set(newIds);
 
         let toRemove = currentIds.filter(x => !newIdsSet.has(x));
@@ -111,16 +113,19 @@ async function updateEvent(body, id) {
         });
 
         //add new tags
-        body.tags.forEach(tag => {
-            if (tag.id == undefined) {
-                Tag.create(tag).then(async (createdTag) => {
-                    Event_Tags.create({
-                        EventId: id,
-                        TagId: createdTag.id
+        if (body.tags != null) {
+            body.tags.forEach(tag => {
+                if (tag.id == undefined) {
+                    Tag.create(tag).then(async (createdTag) => {
+                        Event_Tags.create({
+                            EventId: id,
+                            TagId: createdTag.id
+                        });
                     });
-                });
-            }
-        });
+                }
+            });
+        }
+
         return updatedEvent;
     });
 }

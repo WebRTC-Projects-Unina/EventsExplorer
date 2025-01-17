@@ -4,15 +4,12 @@ import eventRouter from './routes/eventRoutes.js';
 import locationRouter from './routes/locationRoutes.js';
 import loginRouter from './routes/loginRoutes.js';
 import tagRouter from './routes/tagRoutes.js';
-import dotenv from 'dotenv';
-import morgan from 'morgan';
 import log4js from 'log4js';
 import helmet from 'helmet';
 import hpp from 'hpp';
 import cors from 'cors';
 import dayjs from 'dayjs';
 import paginate from 'express-paginate';
-import sequelize from './database.js';
 import { validate } from './middleware/requestValidator.js';
 import compression from 'compression';
 import { errorHandler } from './middleware/errorHandler.js';
@@ -33,10 +30,11 @@ const port = 3000;
 //Security, Compression & Parser
 app.use(helmet());
 app.use(hpp());
+
 app.use(cors({
-    'allowedHeaders': ['Content-Type'],
-    'origin': '*',
-    'preflightContinue': true
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'X-Requested-With'],
+    origin: 'http://localhost:8081'
 }));
 app.use(compression());
 app.use(express.json());

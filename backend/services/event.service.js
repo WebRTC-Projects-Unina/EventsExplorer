@@ -32,7 +32,13 @@ async function deleteEventById(id) {
 
 async function addEvent(body) {
     validateEvent(body);
-    return await eventRepository.addEvent(body);
+    let event = {
+        name: body.name,
+        date: body.date,
+        locationId: body.locationId,
+        description: body.descritpion
+    }
+    return await eventRepository.addEvent(event);
 }
 
 async function updateEvent(body, id) {

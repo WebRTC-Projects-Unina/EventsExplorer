@@ -26,9 +26,9 @@ eventRouter.get('/:id', asyncHandler(async (req, res) => {
 
     const event = await eventService.getEventById(id);
     if (event != null) {
-        return res.status(200).json({
-            ...event
-        });
+        return res.status(200).json(
+            event
+        );
     }
     const error = new NotFoundError(id);
     return res.status(400).json({ error: error.message });

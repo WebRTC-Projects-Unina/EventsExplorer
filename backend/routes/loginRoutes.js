@@ -15,6 +15,6 @@ loginRouter.post('/', asyncHandler(async (req, res, next) => {
     }
     // Generate a token with the user's role
     const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
+    res.json({ username: user.username, token: token });
 }));
 export default loginRouter;
