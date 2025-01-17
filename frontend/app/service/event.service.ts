@@ -1,60 +1,31 @@
-import axios from 'axios';
 import { Event } from '../models/event';
-import Toast from 'react-native-toast-message';
+import useAxiosInterceptor from '@/app/hooks/useAuthInterceptor';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const eventUrl = '/api/events';
+const EventService = () => {
+    const { axios } = useAxiosInterceptor();
 
-// Request interceptor
-axios.interceptors.request.use(
-    (config) => {
-        // TODO set bearer token      
-        return config;
-    },
-    (error) => {
-        Toast.show({
-            type: 'error',
-            text1: error.request?.data?.error
-        });
-        return Promise.reject(error);
+    const getEvents = () => {
+        return axios.get<Event[]>(`${API_URL}${eventUrl}`);
     }
-);
-
-// Response interceptor
-axios.interceptors.response.use(
-    (response) => {
-        return response;
-    },
-    async (error) => {
-        // Handle response errors
-
-
-        Toast.show({
-            type: 'error',
-            text1: error.response?.status + ' ' + error.response?.data?.error
-        });
-        return Promise.reject(error);
+    const getEventById = (id: Number) => {
+        return axios.get<Event>(`${API_URL}${eventUrl}/${id}`);
     }
-);
 
-function getEvents() {
-    return axios.get<Event[]>(`${API_URL}${eventUrl}`);
+    const createEvent = (event: Event) => {
+        event.Location = undefined;
+        return axios.post<Event>(`${API_URL}${eventUrl}`, event);
+    }
+
+    const updateEvent = (event: Event) => {
+        return axios.put<Event>(`${API_URL}${eventUrl}/${event.id}`, event);
+    }
+
+    const deleteEvent = (id: Number) => {
+        return axios.delete(`${API_URL}${eventUrl}/${id}`);
+    }
+    return { getEvents, getEventById, deleteEvent, updateEvent, createEvent }
 }
 
-function getEventById(id: Number) {
-    return axios.get<Event>(`${API_URL}${eventUrl}/${id}`);
-}
-
-function createEvent(event: Event) {
-    return axios.post<Event>(`${API_URL}${eventUrl}`, event);
-}
-
-function updateEvent(event: Event) {
-    return axios.put<Event>(`${API_URL}${eventUrl}/${event.id}`, event);
-}
-
-function deleteEvent(id: Number) {
-    return axios.delete(`${API_URL}${eventUrl}/${id}`);
-}
-
-export { getEvents, getEventById, createEvent, updateEvent, deleteEvent };
+export default EventService;

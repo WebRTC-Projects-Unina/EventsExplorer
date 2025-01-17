@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { Button, useTheme } from 'react-native-paper';
 import { View, Text, TextInput, StyleSheet, Modal, Pressable } from 'react-native';
-import { useNavigation, useRouter, useLocalSearchParams } from "expo-router";
-import * as EventService from '../../service/event.service';
+import { useNavigation, useLocalSearchParams } from "expo-router";
 import * as LocationService from '../../service/location.service';
-
 import DateTimePicker from 'react-native-ui-datepicker';
 import dayjs from 'dayjs';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Event, Location } from '../../models/event';
 import { Picker } from '@react-native-picker/picker';
 import Toast from 'react-native-toast-message';
+import EventService from '@/app/service/event.service';
 
 export default function EditEvent() {
     const navigation = useNavigation();
@@ -25,6 +24,7 @@ export default function EditEvent() {
     const [selectedLocationId, setSelectedLocationId] = useState('');
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const theme = useTheme();
+    const { getEventById, updateEvent, createEvent } = EventService();
 
     const toggleVisibility = () => {
         setIsModalVisible(!isModalVisible);
@@ -45,7 +45,7 @@ export default function EditEvent() {
             setLocations(response.data);
         }).then(() => {
             if (id !== undefined) {
-                EventService.getEventById(Number(id))
+                getEventById(Number(id))
                     .then(response => {
                         setEvent(response.data);
                         setName(response.data.name);
@@ -66,8 +66,9 @@ export default function EditEvent() {
                     date: '',
                     Image: undefined,
                     Location: undefined,
-                    locationId: ''
+                    locationId: locations.length != 0 ? locations[0].id : ''
                 }
+                setSelectedLocationId(defaultItem.locationId);
                 setEvent(defaultItem);
             }
 
@@ -82,9 +83,8 @@ export default function EditEvent() {
             event.date = date.toISOString();
             event.Location = locations.find(o => o.id == selectedLocationId);
             event.locationId = selectedLocationId;
-            console.log(event);
             if (event.id == undefined || event.id == "") {
-                EventService.createEvent(event)
+                createEvent(event)
                     .then(response => {
                         Toast.show({
                             type: 'success',
@@ -96,7 +96,7 @@ export default function EditEvent() {
 
                     });
             } else {
-                EventService.updateEvent(event)
+                updateEvent(event)
                     .then(response => {
                         navigation.goBack();
                     })

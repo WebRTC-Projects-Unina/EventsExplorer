@@ -15,4 +15,10 @@ type Event = {
     locationId: string
 };
 
-export { Event, ImageFile, Location };
+type Login = {
+    username: string,
+    password: string,
+    token: string
+};
+
+export { Event, ImageFile, Location, Login };

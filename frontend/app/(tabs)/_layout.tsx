@@ -1,7 +1,5 @@
 import { Tabs } from 'expo-router';
-
 import Ionicons from '@expo/vector-icons/Ionicons';
-
 
 export default function TabLayout() {
     return (
@@ -18,7 +16,6 @@ export default function TabLayout() {
                 },
             }}
         >
-
             <Tabs.Screen
                 name="index"
                 options={{
@@ -45,6 +42,12 @@ export default function TabLayout() {
                     tabBarIcon: ({ color, focused }) => (
                         <Ionicons name={focused ? 'create' : 'create-outline'} color={color} size={24} />
                     ),
+                }}
+            />
+            <Tabs.Screen
+                name="sign-in"
+                options={{
+                    href: null,
                 }}
             />
         </Tabs>

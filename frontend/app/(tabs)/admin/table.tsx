@@ -1,25 +1,57 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { InteractionManager, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { DataTable, Button, IconButton } from 'react-native-paper';
-import * as EventService from '../../service/event.service';
-import { format } from 'date-fns';
+import EventService from '../../service/event.service';
+import { format, setDate } from 'date-fns';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Event } from '../../models/event';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
+import { useSession } from '@/app/hooks/authProvider';
+
+
 
 const EventTable = () => {
     const [events, setEvents] = useState<Event[]>([]);
+    const [loading, setLoading] = useState(false);
+    const { signOut } = useSession();
 
+    const { getEvents, deleteEvent, getEventById, updateEvent } = EventService();
     useEffect(() => {
-        getEvents();
+        // signOut();
+        // getEventsFromServer();
+
     }, []);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const task = InteractionManager.runAfterInteractions(() => {
+                getEventsFromServer();
+            });
+
+            return () => task.cancel();
+        }, [])
+    );
+
+    const getEventsFromServer = () => {
+        setLoading(true);
+        getEvents().then((response) => {
+            setEvents(response.data);
+            setLoading(false);
+
+        }).catch((error) => {
+            console.log(error.response.error);
+        }).finally(() => {
+            setLoading(false);
+        });
+    }
 
     const handleEdit = (id: string) => {
         router.push({ pathname: '/(tabs)/admin/edit', params: { id } });
     };
     const handleDelete = async (id: string) => {
-        EventService.deleteEvent(Number(id)).then(() => {
+        deleteEvent(Number(id)).then(() => {
             console.log("successful deleted");
+            getEventsFromServer();
         }).catch((error) => {
             console.log(error.response.status + ' ' + error.response.data.error);
         });
@@ -34,13 +66,6 @@ const EventTable = () => {
         console.log('Create new event');
         router.push('/(tabs)/admin/edit');
 
-    };
-    const getEvents = async () => {
-        EventService.getEvents().then((response) => {
-            setEvents(response.data);
-        }).catch((error) => {
-            console.log(error.response.error);
-        });
     };
 
     return (

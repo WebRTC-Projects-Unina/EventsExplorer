@@ -2,7 +2,7 @@ import React, { PropsWithChildren, SetStateAction, useEffect, useState } from "r
 import { Image, type ImageSource } from "expo-image";
 import { Text, View, FlatList, ActivityIndicator, StyleSheet, Modal, Button, TouchableOpacity, Pressable, Dimensions } from "react-native";
 import { format } from 'date-fns';
-import * as EventService from '../service/event.service';
+import EventService from '../service/event.service';
 import { MaterialIcons } from "@expo/vector-icons";
 import { Event, Location } from '../models/event';
 
@@ -24,8 +24,10 @@ export default function Index() {
   }
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const images = API_URL + "/images/";
+  const { getEvents, deleteEvent, getEventById, updateEvent } = EventService();
+
   const [isLoading, setLoading] = useState(true);
-  const [data, setData] = useState<Event[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<Event>(defaultItem);
 
@@ -39,18 +41,15 @@ export default function Index() {
     setIsModalVisible(false);
   };
 
-  const getEvents = async () => {
-
-    EventService.getEvents().then((response) => {
-      setData(response.data);
+  useEffect(() => {
+    setLoading(true);
+    getEvents().then((response) => {
+      setEvents(response.data);
     }).catch((error) => {
       console.log(error.response.error);
     }).finally(() => {
       setLoading(false);
     });
-  };
-  useEffect(() => {
-    getEvents();
   }, []);
 
   const formatDate = (isoDate: string) => {
@@ -180,7 +179,7 @@ export default function Index() {
         style={styles.flatList}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.flatListWrapper}
-        data={data}
+        data={events}
         keyExtractor={({ id }) => id}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.element} onPress={() => onShowDetails(item)}
