@@ -3,12 +3,13 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function TabLayout() {
     return (
-        <Tabs
+        <Tabs backBehavior='history'
             screenOptions={{
                 tabBarActiveTintColor: '#ffffff',
                 headerStyle: {
                     backgroundColor: '#000',
                 },
+
                 headerShadowVisible: false,
                 headerTintColor: '#fff',
                 tabBarStyle: {

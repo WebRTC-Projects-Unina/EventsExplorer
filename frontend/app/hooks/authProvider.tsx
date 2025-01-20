@@ -36,7 +36,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
                         try {
                             if (username != undefined && password != undefined) {
                                 UserService.login(username, password).then(response => {
-                                    console.log(response.data);
                                     setSession(response.data.token);
                                     resolve(response);
                                 }).catch(error => {

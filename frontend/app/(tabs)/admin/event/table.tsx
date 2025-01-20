@@ -50,7 +50,9 @@ const EventTable = () => {
     }
 
     const handleEdit = (id: string) => {
-        router.push({ pathname: './(tabs)/admin/edit', params: { id } });
+        router.push({ pathname: "./edit", params: { id } });
+
+        //router.push({ pathname: './(tabs)/admin/event/edit', params: { id } });
     };
     const handleDelete = async (id: string) => {
         deleteEvent(Number(id)).then(() => {
@@ -67,9 +69,7 @@ const EventTable = () => {
     };
 
     const handleCreate = () => {
-        console.log('Create new event');
-        router.push('./(tabs)/admin/edit');
-
+        router.push('./edit');
     };
 
     return (

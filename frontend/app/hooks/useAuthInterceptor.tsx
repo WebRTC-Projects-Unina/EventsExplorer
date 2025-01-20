@@ -10,7 +10,6 @@ const useAxiosInterceptor = () => {
     React.useEffect(() => {
         const reqInterceptor = axiosInstance.interceptors.request.use(
             (config: any) => {
-                console.log(session);
                 config.headers = {
                     Authorization: `Bearer ${session}`,
                     AccessControlAllowHeaders: 'Content-Type'

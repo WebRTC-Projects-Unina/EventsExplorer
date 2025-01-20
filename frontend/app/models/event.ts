@@ -1,6 +1,9 @@
 type Location = {
-    id: string,
-    name: string
+    id: number,
+    name: string,
+    website: string,
+    longitude: number,
+    latitude: number
 }
 type ImageFile = {
     filename: string,
@@ -12,7 +15,7 @@ type Event = {
     date: string,
     Image: ImageFile | undefined,
     Location: Location | undefined,
-    locationId: string
+    locationId: number
 };
 
 type Login = {

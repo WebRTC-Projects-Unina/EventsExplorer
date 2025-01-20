@@ -2,7 +2,7 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { Button, useTheme } from 'react-native-paper';
 import { View, Text, TextInput, StyleSheet, Modal, Pressable } from 'react-native';
 import { useNavigation, useLocalSearchParams } from "expo-router";
-import * as LocationService from '../../../service/location.service';
+import LocationService from '../../../service/location.service';
 import DateTimePicker from 'react-native-ui-datepicker';
 import dayjs from 'dayjs';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -21,10 +21,11 @@ export default function EditEvent() {
     const [date, setDate] = useState(dayjs());
     const [loading, setLoading] = useState(true);
     const [locations, setLocations] = useState<Location[]>([]);
-    const [selectedLocationId, setSelectedLocationId] = useState('');
+    const [selectedLocationId, setSelectedLocationId] = useState(0);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const theme = useTheme();
     const { getEventById, updateEvent, createEvent } = EventService();
+    const { getLocations } = LocationService();
 
     const toggleVisibility = () => {
         setIsModalVisible(!isModalVisible);
@@ -41,7 +42,7 @@ export default function EditEvent() {
         });
     }, [navigation]);
     useEffect(() => {
-        LocationService.getLocations().then(response => {
+        getLocations().then(response => {
             setLocations(response.data);
         }).then(() => {
             if (id !== undefined) {
@@ -51,7 +52,7 @@ export default function EditEvent() {
                         setName(response.data.name);
                         setDescription(response.data.description);
                         setDate(dayjs(response.data.date));
-                        setSelectedLocationId(response.data.Location?.id || '');
+                        setSelectedLocationId(response.data.Location?.id || 0);
                         setLoading(false);
                     })
                     .catch(error => {
@@ -66,7 +67,7 @@ export default function EditEvent() {
                     date: '',
                     Image: undefined,
                     Location: undefined,
-                    locationId: locations.length != 0 ? locations[0].id : ''
+                    locationId: locations.length != 0 ? locations[0].id : 0
                 }
                 setSelectedLocationId(defaultItem.locationId);
                 setEvent(defaultItem);

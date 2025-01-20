@@ -19,7 +19,8 @@ export default function AdminLayout() {
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <Drawer initialRouteName='event/table'>
+            {/* initialRouteName='event/table' */}
+            <Drawer initialRouteName="event/table" backBehavior="history">
                 <Drawer.Screen
                     name="event/table"
                     options={{
@@ -31,7 +32,13 @@ export default function AdminLayout() {
                     name="event/edit"
                     options={{
                         drawerLabel: undefined,
-                        title: 'Event edit',
+                        drawerItemStyle: { display: 'none' }
+                    }}
+                />
+                <Drawer.Screen
+                    name="location/editLocation"
+                    options={{
+                        drawerLabel: undefined,
                         drawerItemStyle: { display: 'none' }
                     }}
                 />

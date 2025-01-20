@@ -7,7 +7,6 @@ const EventService = () => {
     const { axios } = useAxiosInterceptor();
 
     const getEvents = (data: any) => {
-        console.log(data);
         let searchQuery = "?";
 
         if (data.text != undefined) {
@@ -19,7 +18,6 @@ const EventService = () => {
         if (data.locationId != undefined) {
             searchQuery += "locationId=" + data.locationId + "&"
         }
-        console.log(searchQuery);
         return axios.get<Event[]>(`${API_URL}${eventUrl}${searchQuery}`,);
     }
     const getEventById = (id: Number) => {
