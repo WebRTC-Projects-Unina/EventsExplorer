@@ -1,5 +1,7 @@
 import log4js from 'log4js';
 import * as locationRepository from '../repositories/location.repository.js';
+import { ValidationError } from '../middleware/errorHandler.js';
+
 const log = log4js.getLogger("service:Location");
 log.level = "debug";
 
@@ -32,10 +34,10 @@ function validateLocation(body) {
     if (!body.name) {
         throw new ValidationError("Name is missing");
     }
-    if (!body.latitude) {
+    if (body.latitude == undefined) {
         throw new ValidationError("Latitude is missing.");
     }
-    if (!body.longitude) {
+    if (body.longitude == undefined) {
         throw new ValidationError("Longitude is missing");
     }
 }

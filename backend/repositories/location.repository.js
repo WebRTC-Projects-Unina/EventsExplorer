@@ -10,7 +10,7 @@ async function getLocations(body) {
 }
 
 async function getLocationById(id) {
-    const data = await Location.findByPk(id);
+    const data = await Location.findOne({ where: { id: id } });
     return data;
 }
 

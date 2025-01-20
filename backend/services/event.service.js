@@ -9,7 +9,6 @@ log.level = "debug";
 
 async function getEvents(body) {
     const data = await eventRepository.getEvents(body);
-    //console.log(data);
     data.forEach(element => {
         if (element.Image == null) {
             element.Image = { filename: 'http://localhost:3000/images/noflyer.png' };

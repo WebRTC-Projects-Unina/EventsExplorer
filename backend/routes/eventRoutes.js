@@ -43,11 +43,9 @@ eventRouter.post('/', authenticateToken, authorizeAdmin, asyncHandler(async (req
     log.info("POST");
     try {
         const newEvent = await eventService.addEvent(req.body);
-
         return res.status(201).json(newEvent);
 
     } catch (error) {
-        console.log(error);
         if (error instanceof (ValidationError)) {
             return res.status(422).json({ error: error.message });
         }

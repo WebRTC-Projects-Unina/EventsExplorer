@@ -26,9 +26,9 @@ locationRouter.get('/:id', asyncHandler(async (req, res) => {
 
     const location = await locationService.getLocationById(id);
     if (location != null) {
-        res.status(200).json({
-            ...location
-        });
+        return res.status(200).json(
+            location
+        );
     }
     const error = new NotFoundError(id);
     return res.status(400).json({ error: error.message });
@@ -45,9 +45,9 @@ locationRouter.post('/', authenticateToken, authorizeAdmin, asyncHandler(async (
         return res.status(201).json(newlocation);
     } catch (error) {
         if (error instanceof (ValidationError)) {
-            return res.status(422).json({ error: error.message });
+            return res.status(422).json({ error: error?.message });
         }
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: error?.message });
     }
 }));
 
