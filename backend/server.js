@@ -30,12 +30,7 @@ const port = 3000;
 //Security, Compression & Parser
 app.use(helmet());
 app.use(hpp());
-
-app.use(cors({
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'X-Requested-With'],
-    origin: 'http://localhost:8081'
-}));
+app.use(cors({ credentials: true, origin: 'http://localhost:8081' }));
 app.use(compression());
 app.use(express.json());
 

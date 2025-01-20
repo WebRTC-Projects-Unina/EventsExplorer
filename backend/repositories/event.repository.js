@@ -12,22 +12,22 @@ async function getEvents(body) {
     let text = body.text ?? '';
     const search = {
         where: {
-            [Op.and]: [
-                {
-                    date: {
-                        [Op.gte]: new Date()
-                    },
-                    [Op.or]: {
-                        name: { [Op.like]: '%' + text + '%' },
-                        description: { [Op.like]: '%' + text + '%' }
-                    }
-                }]
-
-        },
-        include: [db.Location, db.Tag, db.Image]
+            [Op.and]: []
+        }, include: [db.Location, db.Tag, db.Image]
     };
     if (body.locationId != undefined) {
         search.where[Op.and].push({ locationId: body.locationId });
+    }
+    if (body.text != undefined) {
+        search.where[Op.and].push({
+            [Op.or]: {
+                name: { [Op.like]: '%' + text + '%' },
+                description: { [Op.like]: '%' + text + '%' }
+            }
+        });
+    }
+    if (body.date != undefined) {
+        search.where[Op.and].push({ date: { [Op.gte]: new Date(body.date) } });
     }
     const data = await Event.findAll(search);
     return data;
@@ -55,7 +55,7 @@ async function getEventById(id) {
 }
 
 async function addEvent(body) {
-    console.log(body);
+
     return await Event.create(body).then((event) => {
         if (body.tags != undefined) {
             body.tags.forEach(tag => {
@@ -66,8 +66,6 @@ async function addEvent(body) {
                 }
             });
         }
-
-
         return event;
     });
 }

@@ -13,7 +13,7 @@ const eventRouter = express.Router();
 // @access  public
 eventRouter.get('/', asyncHandler(async (req, res, next) => {
     log.info("GET");
-    const events = await eventService.getEvents(req.body);
+    const events = await eventService.getEvents(req.query);
     res.json(events);
 }));
 
