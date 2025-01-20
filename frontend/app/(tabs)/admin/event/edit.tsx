@@ -2,11 +2,11 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { Button, useTheme } from 'react-native-paper';
 import { View, Text, TextInput, StyleSheet, Modal, Pressable } from 'react-native';
 import { useNavigation, useLocalSearchParams } from "expo-router";
-import * as LocationService from '../../service/location.service';
+import * as LocationService from '../../../service/location.service';
 import DateTimePicker from 'react-native-ui-datepicker';
 import dayjs from 'dayjs';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Event, Location } from '../../models/event';
+import { Event, Location } from '../../../models/event';
 import { Picker } from '@react-native-picker/picker';
 import Toast from 'react-native-toast-message';
 import EventService from '@/app/service/event.service';
@@ -37,7 +37,7 @@ export default function EditEvent() {
     useLayoutEffect(() => {
         let title = id == undefined ? "Create event" : "Edit event";
         navigation.setOptions({
-            title
+            title,
         });
     }, [navigation]);
     useEffect(() => {

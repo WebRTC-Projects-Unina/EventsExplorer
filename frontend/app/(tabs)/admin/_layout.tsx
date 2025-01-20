@@ -1,9 +1,10 @@
-import { useSession } from '@/app/hooks/authProvider';
-import { Stack, Redirect } from 'expo-router';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Drawer } from 'expo-router/drawer';
 import { Text } from 'react-native';
+import { useSession } from '@/app/hooks/authProvider';
+import { Redirect } from 'expo-router';
 import React from 'react';
 import { router } from 'expo-router';
-
 
 export default function AdminLayout() {
     const { session, isLoading } = useSession();
@@ -12,16 +13,36 @@ export default function AdminLayout() {
         return <Text>Loading...</Text>;
     }
     if (session == null) {
-
-        return <Redirect href='../sign-in' />;
+        return <Redirect href='../../sign-in' />;
     }
-    console.log(session);
-    router.navigate('/(tabs)/admin/table');
+    router.push("/admin/event/table");
 
     return (
-        <Stack>
-            <Stack.Screen name="table" options={{ headerShown: true, title: 'Event overview' }} />
-            <Stack.Screen name="edit" />
-        </Stack>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <Drawer initialRouteName='event/table'>
+                <Drawer.Screen
+                    name="event/table"
+                    options={{
+                        drawerLabel: 'Events',
+                        title: 'Events',
+                    }}
+                />
+                <Drawer.Screen
+                    name="event/edit"
+                    options={{
+                        drawerLabel: undefined,
+                        title: 'Event edit',
+                        drawerItemStyle: { display: 'none' }
+                    }}
+                />
+                <Drawer.Screen
+                    name="location/locationTable"
+                    options={{
+                        drawerLabel: 'Locations',
+                        title: 'Locations',
+                    }}
+                />
+            </Drawer>
+        </GestureHandlerRootView>
     );
 }

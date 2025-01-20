@@ -43,10 +43,12 @@ export default function Index() {
 
   useEffect(() => {
     setLoading(true);
-    getEvents().then((response) => {
+    var d = new Date(2024, 10, 24);
+    let search = { date: d.toISOString() };
+    getEvents(search).then((response) => {
       setEvents(response.data);
     }).catch((error) => {
-      console.log(error.response.error);
+      console.log(error.response?.error);
     }).finally(() => {
       setLoading(false);
     });

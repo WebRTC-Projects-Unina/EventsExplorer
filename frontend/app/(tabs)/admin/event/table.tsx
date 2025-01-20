@@ -1,27 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { InteractionManager, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { DataTable, Button, IconButton } from 'react-native-paper';
-import EventService from '../../service/event.service';
+import EventService from '../../../service/event.service';
 import { format, setDate } from 'date-fns';
 import { ScrollView } from 'react-native-gesture-handler';
-import { Event } from '../../models/event';
-import { router, useFocusEffect } from 'expo-router';
+import { Event } from '../../../models/event';
+import { router, useFocusEffect, useNavigation } from 'expo-router';
 import { useSession } from '@/app/hooks/authProvider';
-
-
 
 const EventTable = () => {
     const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(false);
     const { signOut } = useSession();
+    const navigation = useNavigation();
 
     const { getEvents, deleteEvent, getEventById, updateEvent } = EventService();
     useEffect(() => {
-        // signOut();
+        //signOut();
         // getEventsFromServer();
 
     }, []);
-
+    useLayoutEffect(() => {
+        let title = "Event overview";
+        navigation.setOptions({
+            title
+        });
+    }, [navigation]);
     useFocusEffect(
         React.useCallback(() => {
             const task = InteractionManager.runAfterInteractions(() => {
@@ -34,7 +38,7 @@ const EventTable = () => {
 
     const getEventsFromServer = () => {
         setLoading(true);
-        getEvents().then((response) => {
+        getEvents({}).then((response) => {
             setEvents(response.data);
             setLoading(false);
 
@@ -46,7 +50,7 @@ const EventTable = () => {
     }
 
     const handleEdit = (id: string) => {
-        router.push({ pathname: '/(tabs)/admin/edit', params: { id } });
+        router.push({ pathname: './(tabs)/admin/edit', params: { id } });
     };
     const handleDelete = async (id: string) => {
         deleteEvent(Number(id)).then(() => {
@@ -64,7 +68,7 @@ const EventTable = () => {
 
     const handleCreate = () => {
         console.log('Create new event');
-        router.push('/(tabs)/admin/edit');
+        router.push('./(tabs)/admin/edit');
 
     };
 

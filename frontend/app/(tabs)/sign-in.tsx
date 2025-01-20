@@ -11,7 +11,7 @@ export default function SignInScreen() {
 
     const signInLocal = async () => {
         signIn(username, password).then(() => {
-            router.replace('./admin');
+            router.navigate("./admin/event/table", { relativeToDirectory: false })
         }).catch(error => {
 
         });
