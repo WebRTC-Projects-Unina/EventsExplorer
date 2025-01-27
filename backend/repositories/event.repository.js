@@ -13,7 +13,7 @@ async function getEvents(body) {
     const search = {
         where: {
             [Op.and]: []
-        }, include: [db.Location, db.Tag, db.Image]
+        }, include: [db.Location, db.Image]
     };
     if (body.locationId != undefined) {
         search.where[Op.and].push({ locationId: body.locationId });
@@ -61,7 +61,10 @@ async function addEvent(body) {
             body.tags.forEach(tag => {
                 if (tag.id == undefined) {
                     Tag.create(tag).then(async (tag) => {
-                        await tag.addEvent(event);
+                        await Event_Tags.create({
+                            EventId: event.id,
+                            TagId: tag.id
+                        });
                     });
                 }
             });
@@ -78,52 +81,44 @@ async function updateEvent(body, id) {
         include: [db.Location, db.Tag]
     }).then(async (updatedEvent) => {
         //Get the current tags
-        let event_tags = await Event_Tags.findAll({
+        const event_tags = await Event_Tags.findAll({
             where: {
                 EventId: id
             }
         });
 
-        let currentIds = event_tags == null ? new Array() : event_tags?.map(o => o.TagId);
-        let currentIdsSet = new Set(currentIds);
-        let newIds = body.tags == null ? new Array() : body.tags.map(o => o.id);
-        let newIdsSet = new Set(newIds);
+        const currentTagIds = event_tags?.map(o => o.TagId) || [];
+        const currentIdsSet = new Set(currentTagIds);
 
-        let toRemove = currentIds.filter(x => !newIdsSet.has(x));
-        let add = newIds.filter(x => !currentIdsSet.has(x));
+        const newTagIds = body.tags?.map(o => o.id) || [];
+        const newIdsSet = new Set(newTagIds);
+        const tagIdsToRemove = currentTagIds.filter(id => !newIdsSet.has(id));
+        const tagsToAdd = body.tags.filter(tag => !currentIdsSet.has(tag.id));
 
-        // let difference = currentIds.filter(x => !toRemove.has(x));
         await Event_Tags.destroy({
             where: {
                 [Op.and]: {
                     EventId: id,
-                    TagId: toRemove
+                    TagId: tagIdsToRemove
                 }
             }
         });
-        add.forEach(async o => {
-            if (o != undefined) {
+        tagsToAdd.forEach(async o => {
+            if (o.id == undefined || o.id == 0 || o.id == '') {
+                Tag.create({ "name": o.name }).then(async (tag) => {
+                    await Event_Tags.create({
+                        EventId: id,
+                        TagId: tag.id
+                    });
+                });
+            }
+            else {
                 await Event_Tags.create({
                     EventId: id,
-                    TagId: o
+                    TagId: o.id
                 });
             }
         });
-
-        //add new tags
-        if (body.tags != null) {
-            body.tags.forEach(tag => {
-                if (tag.id == undefined) {
-                    Tag.create(tag).then(async (createdTag) => {
-                        Event_Tags.create({
-                            EventId: id,
-                            TagId: createdTag.id
-                        });
-                    });
-                }
-            });
-        }
-
         return updatedEvent;
     });
 }

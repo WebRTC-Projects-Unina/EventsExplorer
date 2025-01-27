@@ -12,8 +12,8 @@ const tagRouter = express.Router();
 // @access  public
 tagRouter.get('/', asyncHandler(async (req, res, next) => {
     log.info("GET");
-    const tags = await tagservice.getTags(req.body);
-    res.json(tags);
+    const tags = await tagservice.getTags(req.query);
+    return res.json(tags);
 }));
 
 

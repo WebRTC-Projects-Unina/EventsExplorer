@@ -35,7 +35,8 @@ async function addEvent(body) {
         name: body.name,
         date: body.date,
         locationId: body.locationId,
-        description: body.descritpion
+        description: body.description,
+        tags: body.tags
     }
     return await eventRepository.addEvent(event);
 }

@@ -6,12 +6,15 @@ const log = log4js.getLogger("tag repository");
 
 const Tag = db.Tag;
 
-async function getTags(body) {
-    let text = body.text ?? '';
+async function getTags(query) {
+    let text = query.search ?? '';
+    console.log(text);
     const search = {
         where: {
             name: { [Op.like]: '%' + text + '%' },
-        }
+        },
+        exclude: ['createdAt', 'updatedAt']
+
     };
     const data = await Tag.findAll(search);
     return data;
