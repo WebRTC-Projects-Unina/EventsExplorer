@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { Button } from 'react-native-paper';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { useSession } from "../hooks/authProvider";
+import Toast from "react-native-toast-message";
 
 export default function SignInScreen() {
     const [username, setUsername] = React.useState('');
@@ -13,7 +14,10 @@ export default function SignInScreen() {
         signIn(username, password).then(() => {
             router.navigate("./admin/event/table", { relativeToDirectory: false })
         }).catch(error => {
-
+            Toast.show({
+                type: 'error',
+                text1: error.response?.data?.error
+            });
         });
     };
 

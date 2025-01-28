@@ -33,24 +33,18 @@ export function SessionProvider({ children }: PropsWithChildren) {
             value={{
                 signIn: (username: string, password: string) => {
                     return new Promise((resolve, reject) => {
-                        try {
-                            if (username != undefined && password != undefined) {
-                                UserService.login(username, password).then(response => {
-                                    setSession(response.data.token);
-                                    resolve(response);
-                                }).catch(error => {
-                                    console.log(error);
-                                });
-                            }
-                            else {
-                                reject(new Error('Username or password is undefined'));
-                            }
-                        } catch (error) {
-                            console.error('Failed to authorize:', error);
-                            reject(error);
+                        if (username != undefined && password != undefined) {
+                            UserService.login(username, password).then(response => {
+                                setSession(response.data.token);
+                                resolve(response);
+                            }).catch(error => {
+                                reject(error);
+                            });
+                        }
+                        else {
+                            reject(new Error('Username or password is undefined'));
                         }
                     })
-
                 },
                 signOut: () => {
                     setSession(null);

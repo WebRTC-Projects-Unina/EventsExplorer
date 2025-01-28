@@ -9,14 +9,19 @@ type ImageFile = {
     filename: string,
 }
 type Event = {
-    id: string,
+    id: number,
     name: string,
     description: string,
     date: string,
     Image: ImageFile | undefined,
     Location: Location | undefined,
-    locationId: number
+    locationId: number,
+    Tags: Tag[]
 };
+type Tag = {
+    id?: number,
+    name: string
+}
 
 type Login = {
     username: string,
@@ -24,4 +29,4 @@ type Login = {
     token: string
 };
 
-export { Event, ImageFile, Location, Login };
+export { Event, ImageFile, Location, Login, Tag };

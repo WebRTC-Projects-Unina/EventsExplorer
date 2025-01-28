@@ -49,12 +49,12 @@ const EventTable = () => {
         });
     }
 
-    const handleEdit = (id: string) => {
+    const handleEdit = (id: number) => {
         router.push({ pathname: "./edit", params: { id } });
 
         //router.push({ pathname: './(tabs)/admin/event/edit', params: { id } });
     };
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (id: number) => {
         deleteEvent(Number(id)).then(() => {
             console.log("successful deleted");
             getEventsFromServer();

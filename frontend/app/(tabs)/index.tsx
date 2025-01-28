@@ -14,13 +14,14 @@ type Props = PropsWithChildren<{
 export default function Index() {
 
   const defaultItem: Event = {
-    id: '',
+    id: 0,
     name: '',
     description: '',
     date: '',
     Image: undefined,
     Location: undefined,
-    locationId: ''
+    locationId: 0,
+    Tags: []
   }
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const images = API_URL + "/images/";
@@ -182,7 +183,7 @@ export default function Index() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.flatListWrapper}
         data={events}
-        keyExtractor={({ id }) => id}
+        keyExtractor={({ id }) => id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.element} onPress={() => onShowDetails(item)}
           >
