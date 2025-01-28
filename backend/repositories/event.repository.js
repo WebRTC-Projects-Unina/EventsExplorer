@@ -90,10 +90,11 @@ async function updateEvent(body, id) {
         const currentTagIds = event_tags?.map(o => o.TagId) || [];
         const currentIdsSet = new Set(currentTagIds);
 
-        const newTagIds = body.tags?.map(o => o.id) || [];
+        const newTagIds = body.Tags?.map(o => o.id) || [];
         const newIdsSet = new Set(newTagIds);
+
         const tagIdsToRemove = currentTagIds.filter(id => !newIdsSet.has(id));
-        const tagsToAdd = body.tags.filter(tag => !currentIdsSet.has(tag.id));
+        const tagsToAdd = body.Tags.filter(tag => !currentIdsSet.has(tag.id));
 
         await Event_Tags.destroy({
             where: {
@@ -105,11 +106,18 @@ async function updateEvent(body, id) {
         });
         tagsToAdd.forEach(async o => {
             if (o.id == undefined || o.id == 0 || o.id == '') {
-                Tag.create({ "name": o.name }).then(async (tag) => {
-                    await Event_Tags.create({
-                        EventId: id,
-                        TagId: tag.id
-                    });
+
+                let tag = await Tag.findOne({
+                    where: {
+                        name: o.name
+                    }
+                });
+                if (!tag) {
+                    tag = await Tag.create({ "name": o.name })
+                }
+                await Event_Tags.create({
+                    EventId: id,
+                    TagId: tag.id
                 });
             }
             else {
