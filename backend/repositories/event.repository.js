@@ -10,10 +10,21 @@ const Event_Tags = db.Event_Tags;
 
 async function getEvents(body) {
     let text = body.text ?? '';
+    let tagFilter = {};
+    if (body.tag != undefined && !isNaN(Number(body.tag))) {
+        tagFilter = { id: Number(body.tag) };
+    }
+
     const search = {
         where: {
             [Op.and]: []
-        }, include: [db.Location, db.Image]
+        }, include: [db.Location, db.Image, {
+            model: db.Tag, attributes: ['id', 'name'],
+            where: tagFilter,
+            through: {
+                attributes: [],
+            }
+        },]
     };
     if (body.locationId != undefined) {
         search.where[Op.and].push({ locationId: body.locationId });
