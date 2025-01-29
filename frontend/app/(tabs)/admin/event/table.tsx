@@ -38,7 +38,7 @@ const EventTable = () => {
 
     const getEventsFromServer = () => {
         setLoading(true);
-        getEvents({}).then((response) => {
+        getEvents(undefined).then((response) => {
             setEvents(response.data);
             setLoading(false);
 
@@ -51,8 +51,6 @@ const EventTable = () => {
 
     const handleEdit = (id: number) => {
         router.push({ pathname: "./edit", params: { id } });
-
-        //router.push({ pathname: './(tabs)/admin/event/edit', params: { id } });
     };
     const handleDelete = async (id: number) => {
         deleteEvent(Number(id)).then(() => {

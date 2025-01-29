@@ -1,10 +1,13 @@
 import React, { PropsWithChildren, SetStateAction, useEffect, useState } from "react";
 import { Image, type ImageSource } from "expo-image";
-import { Text, View, FlatList, ActivityIndicator, StyleSheet, Modal, Button, TouchableOpacity, Pressable, Dimensions } from "react-native";
+import { Text, View, FlatList, StyleSheet, Modal, TouchableOpacity, Pressable } from "react-native";
 import { format } from 'date-fns';
 import EventService from '../service/event.service';
 import { MaterialIcons } from "@expo/vector-icons";
 import { Event, Location } from '../models/event';
+import FilterComponent from "../components/filter.component";
+import LocationService from "../service/location.service";
+import { Search } from "../models/search";
 
 type Props = PropsWithChildren<{
   isVisible: boolean;
@@ -26,14 +29,16 @@ export default function Index() {
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const images = API_URL + "/images/";
   const { getEvents, deleteEvent, getEventById, updateEvent } = EventService();
+  const { getLocations } = LocationService();
 
   const [isLoading, setLoading] = useState(true);
   const [events, setEvents] = useState<Event[]>([]);
+  const [filter, setFilter] = useState<Search>();
+  const [locations, setLocations] = useState<Location[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<Event>(defaultItem);
 
   const onShowDetails = (item: Event) => {
-
     setSelectedItem(item);
     setIsModalVisible(true);
   };
@@ -44,13 +49,22 @@ export default function Index() {
 
   useEffect(() => {
     setLoading(true);
-    var d = new Date(2024, 10, 24);
-    let search = { date: d.toISOString() };
-    getEvents(search).then((response) => {
+    getEvents(filter).then((response) => {
       setEvents(response.data);
     }).catch((error) => {
       console.log(error.response?.error);
     }).finally(() => {
+      setLoading(false);
+    });
+
+  }, [filter]);
+
+
+  useEffect(() => {
+    setLoading(true);
+    getLocations().then((response) => {
+      response.data.unshift({ id: 0, name: "All", latitude: 0, longitude: 0, website: "" });
+      setLocations(response.data);
       setLoading(false);
     });
   }, []);
@@ -59,6 +73,12 @@ export default function Index() {
     const date = new Date(isoDate);
     return format(date, 'dd.MM.yyyy');
   };
+
+  const handleFilters = (filters: Search) => {
+    setFilter(filters);
+  };
+
+
   const [active, setactive] = useState(false);
 
   const styles = StyleSheet.create({
@@ -140,7 +160,6 @@ export default function Index() {
       borderWidth: 2,
     },
     modalContent: {
-
       alignItems: 'center'
     },
     image: {
@@ -178,6 +197,7 @@ export default function Index() {
           </View>
         </View>
       </Modal>
+      <FilterComponent locations={locations} onApplyFilters={handleFilters} />
       <FlatList
         style={styles.flatList}
         showsVerticalScrollIndicator={false}
@@ -199,9 +219,7 @@ export default function Index() {
               <Text>{item.description}</Text>
               <Text>{item.Location?.name}</Text>
             </View>
-
           </TouchableOpacity>
-
         )}
       />
     </View>

@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message';
 import EventService from '@/app/service/event.service';
 import TagService from '@/app/service/tag.service';
 import { Dropdown, DropdownInputProps, Option } from 'react-native-paper-dropdown';
+import DatePicker from '@/app/components/datepicker.component';
 
 
 export default function EditEvent() {
@@ -20,11 +21,10 @@ export default function EditEvent() {
     const [event, setEvent] = useState<Event>();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [date, setDate] = useState(dayjs());
+    const [selectedDate, setDate] = useState<Date>();
     const [loading, setLoading] = useState(true);
     const [locations, setLocations] = useState<Location[]>([]);
     const [selectedLocationId, setSelectedLocationId] = useState<string>();
-    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const theme = useTheme();
     const { getEventById, updateEvent, createEvent } = EventService();
     const { getLocations } = LocationService();
@@ -65,14 +65,6 @@ export default function EditEvent() {
         setTags(tags.filter(tag => tag !== tagToRemove));
     };
 
-    const toggleVisibility = () => {
-        setIsModalVisible(!isModalVisible);
-    };
-
-    const onDateChanged = (params: any) => {
-        setDate(dayjs(params.date));
-        setIsModalVisible(false);
-    };
     useLayoutEffect(() => {
         let title = id == undefined ? "Create event" : "Edit event";
         navigation.setOptions({
@@ -93,7 +85,7 @@ export default function EditEvent() {
                         setEvent(response.data);
                         setName(response.data.name);
                         setDescription(response.data.description || "");
-                        setDate(dayjs(response.data.date));
+                        setDate(new Date(response.data.date));
                         setSelectedLocationId(response.data.Location?.id.toString() || "");
                         setTags(response.data.Tags || []);
                         setLoading(false);
@@ -116,7 +108,7 @@ export default function EditEvent() {
                 setSelectedLocationId(defaultItem.locationId.toString());
                 setName('');
                 setTags([]);
-                setDate(dayjs(new Date()));
+                setDate(new Date());
                 setDescription('');
                 setEvent(defaultItem);
             }
@@ -142,7 +134,7 @@ export default function EditEvent() {
         if (event != undefined) {
             event.name = name;
             event.description = description;
-            event.date = date.toISOString();
+            event.date = selectedDate?.toISOString() || "";
             event.Location = locations.find(o => o.id == Number(selectedLocationId));
             event.locationId = Number(selectedLocationId);
             event.Tags = tags;
@@ -206,34 +198,6 @@ export default function EditEvent() {
             justifyContent: 'space-around',
             marginTop: 20,
         },
-        //Modal
-        overlay: {
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        },
-        modalContent: {
-            alignItems: 'center',
-            backgroundColor: 'rgba(255,255,255,1)',
-        },
-        datePickerContainer: {
-            position: 'relative',
-            paddingTop: 20,
-        },
-        closeButton: {
-            position: 'absolute',
-            color: 'black',
-            backgroundColor: 'white',
-            top: 0,
-            right: 5,
-            zIndex: 1,
-        },
-        //
-
-
-
-
         tagContainer: {
             flexDirection: 'row',
             flexWrap: 'wrap',
@@ -266,31 +230,7 @@ export default function EditEvent() {
 
     return (
         <View style={styles.container}>
-            <Modal animationType="slide" transparent={true} visible={isModalVisible}>
-                <View style={styles.overlay}>
-                    <View style={styles.modalContent}>
-                        <View style={styles.datePickerContainer}>
-                            <View style={styles.closeButton}>
-                                <Pressable onPress={toggleVisibility} >
-                                    <MaterialIcons name="close" color="#000" size={22} />
-                                </Pressable>
-                            </View>
-                            <DateTimePicker
-                                mode="single"
-                                date={date}
-                                firstDayOfWeek={1}
-                                onChange={onDateChanged}
-                                todayContainerStyle={{
-                                    borderWidth: 1,
-                                }}
-                                headerButtonColor={theme?.colors.primary
-                                }
-                                selectedItemColor={theme?.colors.primary}
-                            />
-                        </View>
-                    </View>
-                </View>
-            </Modal>
+
             <View style={styles.form}>
                 <TextInput
                     style={styles.input}
@@ -303,17 +243,19 @@ export default function EditEvent() {
                     style={styles.input}
                     mode='outlined'
                     label="Description"
-                    value={name}
-                    onChangeText={setName}
+                    value={description}
+                    onChangeText={setDescription}
                 />
-                <TextInput
-                    mode='outlined'
-                    label="Date"
-                    onTouchStart={toggleVisibility}
-                    onPointerDown={toggleVisibility}
-                    style={styles.input}
-                    value={date.format('DD.MM.YYYY')} />
+                <View style={{ marginBottom: 10 }}>
+
+                    <DatePicker
+                        initialDate={selectedDate}
+                        onDateChange={setDate}
+                        theme={theme}
+                    />
+                </View>
                 <Dropdown
+                    hideMenuHeader={true}
                     CustomDropdownInput={CustomDropdownInput}
                     mode="outlined"
                     label="Locations"
@@ -321,6 +263,7 @@ export default function EditEvent() {
                     value={selectedLocationId}
                     placeholder="Select Location" options={mapLocationsToOption()}
                 />
+
                 <View style={styles.input}>
                     <TextInput
                         mode='outlined'
@@ -360,5 +303,4 @@ export default function EditEvent() {
             </View>
         </View >
     );
-
 }

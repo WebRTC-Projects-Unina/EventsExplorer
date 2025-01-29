@@ -1,22 +1,26 @@
 import { Event } from '../models/event';
 import useAxiosInterceptor from '@/app/hooks/useAuthInterceptor';
+import { Search } from '../models/search';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const eventUrl = '/api/events';
 const EventService = () => {
     const { axios } = useAxiosInterceptor();
 
-    const getEvents = (data: any) => {
+    const getEvents = (data: Search | undefined) => {
         let searchQuery = "?";
 
-        if (data.text != undefined) {
+        if (data?.text != undefined && data?.text.length > 0) {
             searchQuery += "text=" + data.text + "&"
         }
-        if (data.date != undefined) {
-            searchQuery += "date=" + data.date + "&"
+        if (data?.date != undefined) {
+            searchQuery += "date=" + data.date.toISOString() + "&"
         }
-        if (data.locationId != undefined) {
-            searchQuery += "locationId=" + data.locationId + "&"
+        if (data?.location != undefined) {
+            searchQuery += "locationId=" + data.location + "&"
+        }
+        if (data?.tag != undefined) {
+            searchQuery += "tag=" + data.tag + "&"
         }
         return axios.get<Event[]>(`${API_URL}${eventUrl}${searchQuery}`,);
     }
