@@ -1,55 +1,119 @@
-import React, { PropsWithChildren, SetStateAction, useEffect, useState } from "react";
-import { Image, type ImageSource } from "expo-image";
-import { Text, View, FlatList, StyleSheet, Modal, TouchableOpacity, Pressable } from "react-native";
+import React, { PropsWithChildren, useEffect, useState } from "react";
+import { Text, View, FlatList, StyleSheet, Modal, TouchableOpacity, ImageBackground, useWindowDimensions } from "react-native";
 import { format } from 'date-fns';
 import EventService from '../service/event.service';
-import { MaterialIcons } from "@expo/vector-icons";
-import { Event, Location } from '../models/event';
+import { Event, Location, Tag } from '../models/event';
 import FilterComponent from "../components/filter.component";
 import LocationService from "../service/location.service";
 import { Search } from "../models/search";
-
-type Props = PropsWithChildren<{
-  isVisible: boolean;
-  onClose: () => void;
-}>;
+import { Icon, useTheme } from "react-native-paper";
 
 export default function Index() {
 
-  const defaultItem: Event = {
-    id: 0,
-    name: '',
-    description: '',
-    date: '',
-    Image: undefined,
-    Location: undefined,
-    locationId: 0,
-    Tags: []
-  }
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const images = API_URL + "/images/";
-  const { getEvents, deleteEvent, getEventById, updateEvent } = EventService();
+  const theme = useTheme();
+  const { getEvents } = EventService();
   const { getLocations } = LocationService();
-
   const [isLoading, setLoading] = useState(true);
   const [events, setEvents] = useState<Event[]>([]);
   const [filter, setFilter] = useState<Search>();
   const [locations, setLocations] = useState<Location[]>([]);
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [selectedItem, setSelectedItem] = useState<Event>(defaultItem);
+  const { width } = useWindowDimensions();
 
-  const onShowDetails = (item: Event) => {
-    setSelectedItem(item);
-    setIsModalVisible(true);
-  };
+  const styles = StyleSheet.create({
+    eventCard: {
+      margin: 10,
+      overflow: "hidden",
+      elevation: 5,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
+      backgroundColor: "#f3f3f3",
+      width: 300,
+      marginBottom: 10,
+    },
+    imageBackground: {
+      height: 150,
+      width: "100%",
+      justifyContent: "flex-end",
+    },
+    overlay: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: "rgba(0, 0, 0, 0.3)",
+    },
+    eventName: {
+      color: theme.colors.onPrimary,
+      fontSize: 16,
+      fontWeight: "bold",
+      padding: 8,
+      backgroundColor: theme.colors.primary,
+      textAlign: "left",
+    },
+    eventDetails: {
+      padding: 10,
+    },
+    eventDate: {
+      fontSize: 14,
+      color: "#555",
+      paddingRight: 5,
+      marginRight: 5,
+      marginBottom: 5,
+    },
+    eventLocation: {
+      fontSize: 14,
+      fontWeight: "bold",
+      color: "#333",
+      flexDirection: "row",
+      marginBottom: 5,
+    },
+    tagContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+    },
+    tag: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderColor: theme?.colors.primary,
+      borderWidth: 1,
+      paddingVertical: 2.5,
+      paddingHorizontal: 5,
+      margin: 2.5,
+    },
+    tagText: {
+      fontSize: 12,
+      color: theme?.colors.primary,
+    },
+  });
 
-  const onModalClose = () => {
-    setIsModalVisible(false);
+  const minCols = 2;
+
+  const calcNumColumns = (width: number) => {
+    const cols = width / styles.eventCard.width;
+    const colsFloor = Math.floor(cols) > minCols ? Math.floor(cols) : minCols;
+    const colsMinusMargin = cols - 2 * colsFloor * styles.eventCard.margin;
+    if (colsMinusMargin < colsFloor && colsFloor > minCols) return colsFloor - 1;
+    else return colsFloor;
   };
+  const [numberOfColumns, setNumberOfColumns] = useState(calcNumColumns(width));
+  const openInNewTab = (url: string): void => {
+    console.log(url);
+    const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
+    if (newWindow) newWindow.opener = null
+  }
+
+  useEffect(() => {
+    setNumberOfColumns(calcNumColumns(width));
+  }, [width]);
 
   useEffect(() => {
     setLoading(true);
     getEvents(filter).then((response) => {
+      response.data.map((o) => {
+        if (o.Image == undefined)
+          o.Image = { filename: images + "noflyer.png" };
+      });
       setEvents(response.data);
     }).catch((error) => {
       console.log(error.response?.error);
@@ -77,150 +141,54 @@ export default function Index() {
   const handleFilters = (filters: Search) => {
     setFilter(filters);
   };
+  const onTag = (tag: Tag) => {
+    console.log(tag);
+  }
 
-
-  const [active, setactive] = useState(false);
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#000',
-    },
-    element: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      width: '100%',
-      padding: 5,
-      backgroundColor: '#fff',
-      borderRadius: 8,
-      shadowColor: '#000',
-      shadowOpacity: 0.1,
-      shadowOffset: { width: 0, height: 2 },
-      shadowRadius: 4,
-      elevation: 3,
-      marginTop: 5,
-      marginBottom: 5
-    },
-    header: {
-      fontWeight: 900
-    },
-    leftSection: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 10,
-      borderRightWidth: 1,
-      borderRightColor: '#ccc',
-    },
-    dateText: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      color: '#333',
-    },
-    rightSection: {
-      flex: 3,
-      justifyContent: 'center',
-      padding: 10,
-    },
-    titleText: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: '#000',
-      marginBottom: 5,
-    },
-    descriptionText: {
-      fontSize: 14,
-      color: '#666',
-    },
-    text: {
-      color: '#fff',
-    },
-    button: {
-      fontSize: 20,
-      textDecorationLine: 'underline',
-      color: '#fff',
-    },
-    flatListWrapper: {
-      justifyContent: 'center',
-      flexGrow: 1
-    },
-    flatList: {
-      width: '95%',
-    },
-    View: {
-      backgroundColor: "white",
-      height: 140,
-      width: 250,
-      borderRadius: 15,
-      alignItems: "center",
-      justifyContent: "center",
-      borderColor: "black",
-      borderWidth: 2,
-    },
-    modalContent: {
-      alignItems: 'center'
-    },
-    image: {
-      borderRadius: 18,
-      width: 320,
-      height: 440,
-    },
-    smallImage: {
-      width: 50,
-      height: 50
-    },
-    overlay: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    closeButton: {
-      justifyContent: "flex-end"
-
-    }
-  });
-
-  return (
-    <View style={styles.container}>
-      <Modal animationType="slide" transparent={true} visible={isModalVisible}>
-        <View style={styles.overlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.closeButton}>
-              <Pressable onPress={onModalClose} >
-                <MaterialIcons name="close" color="#fff" size={22} />
-              </Pressable>
-            </View>
-            <Image style={styles.image} source={selectedItem.Image?.filename} />
-          </View>
+  const renderEvent = ({ item }: any) => (
+    <View style={styles.eventCard} key={item.id}>
+      <ImageBackground
+        source={{ uri: item.Image?.filename }}
+        style={styles.imageBackground}
+      >
+        <View style={styles.overlay} />
+        <Text style={styles.eventName}>{item.name}</Text>
+      </ImageBackground>
+      <View style={styles.eventDetails}>
+        <Text style={styles.eventDate}>
+          <Icon size={14} source="calendar" />
+          {formatDate(item.date)}
+        </Text>
+        <TouchableOpacity style={styles.eventLocation} onPress={() => {
+          openInNewTab(`http://www.openstreetmap.org/?mlat=${item.Location.latitude}&mlon=${item.Location.longitude}&zoom=12`);
+        }}>
+          <Icon size={14} source="map-marker" />
+          <Text>
+            {item.Location?.name}
+          </Text>
+        </TouchableOpacity>
+        <View style={styles.tagContainer}>
+          {item.Tags.map((tag: Tag) => (
+            <TouchableOpacity key={tag.id} style={styles.tag} onPress={() => onTag(tag)}>
+              <Text style={styles.tagText}>{tag.name}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
-      </Modal>
-      <FilterComponent locations={locations} onApplyFilters={handleFilters} />
+      </View>
+    </View>
+  );
+  return (
+    <View style={{ height: "90%" }}>
+      <View style={{ marginBottom: 10, alignItems: "center" }}>
+        <FilterComponent locations={locations} onApplyFilters={handleFilters} />
+      </View>
       <FlatList
-        style={styles.flatList}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.flatListWrapper}
+        key={numberOfColumns}
+        contentContainerStyle={{ padding: 10, justifyContent: "center", width: "100%", alignItems: "center" }}
         data={events}
-        keyExtractor={({ id }) => id.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.element} onPress={() => onShowDetails(item)}
-          >
-            <View style={styles.leftSection}>
-              <Image style={styles.smallImage} source={selectedItem.Image?.filename} />
-
-              <Text style={styles.dateText}>{formatDate(item.date)}</Text>
-            </View>
-            <View style={styles.rightSection}>
-              <Text style={styles.header}>
-                {item.name}
-              </Text>
-              <Text>{item.description}</Text>
-              <Text>{item.Location?.name}</Text>
-            </View>
-          </TouchableOpacity>
-        )}
+        renderItem={renderEvent}
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={numberOfColumns}
       />
     </View>
   );

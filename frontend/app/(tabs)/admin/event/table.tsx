@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { InteractionManager, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { DataTable, Button, IconButton } from 'react-native-paper';
+import { DataTable, Button, IconButton, useTheme } from 'react-native-paper';
 import EventService from '../../../service/event.service';
 import { format, setDate } from 'date-fns';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -13,6 +13,7 @@ const EventTable = () => {
     const [loading, setLoading] = useState(false);
     const { signOut } = useSession();
     const navigation = useNavigation();
+    const theme = useTheme();
 
     const { getEvents, deleteEvent, getEventById, updateEvent } = EventService();
     useEffect(() => {
@@ -69,7 +70,32 @@ const EventTable = () => {
     const handleCreate = () => {
         router.push('./edit');
     };
-
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            padding: 16,
+            backgroundColor: '#fff',
+        },
+        actionButton: {
+            marginHorizontal: 4,
+        },
+        fab: {
+            backgroundColor: theme.colors.primary,
+            position: 'absolute',
+            right: 16,
+            bottom: 16,
+            borderRadius: 28,
+            width: 56,
+            height: 56,
+            justifyContent: 'center',
+            alignItems: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.3,
+            shadowRadius: 4,
+            elevation: 5,
+        },
+    });
     return (
         <View style={styles.container}>
             <ScrollView>
@@ -107,31 +133,6 @@ const EventTable = () => {
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-        backgroundColor: '#fff',
-    },
-    actionButton: {
-        marginHorizontal: 4,
-    },
-    fab: {
-        position: 'absolute',
-        right: 16,
-        bottom: 16,
-        backgroundColor: '#6200ea',
-        borderRadius: 28,
-        width: 56,
-        height: 56,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-});
+
 
 export default EventTable;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { Button, useTheme, TextInput } from 'react-native-paper';
-import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
+import { Button, TextInput } from 'react-native-paper';
+import { View, StyleSheet } from 'react-native';
 import { useNavigation, useLocalSearchParams, router } from "expo-router";
 import LocationService from '../../../service/location.service';
 import { Location } from '../../../models/event';
@@ -18,11 +18,6 @@ export default function EditEvent() {
 
     const [loading, setLoading] = useState(true);
     const { getLocationById, createLocation, updateLocation } = LocationService();
-
-    useEffect(() => {
-
-
-    }, []);
 
     useLayoutEffect(() => {
         let title = id == undefined ? "Create location" : "Edit location";
