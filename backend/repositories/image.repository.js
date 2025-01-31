@@ -8,7 +8,6 @@ async function getImage(body) {
     const search = {
         where: {
             Imagename: body.Imagename,
-            password: body.password
         }
     };
 

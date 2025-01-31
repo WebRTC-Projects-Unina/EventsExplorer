@@ -10,7 +10,7 @@ const Event_Tags = db.Event_Tags;
 
 async function getEvents(body) {
     let text = body.text ?? '';
-    let tagFilter = {};
+    let tagFilter = undefined;
     if (body.tag != undefined && !isNaN(Number(body.tag))) {
         tagFilter = { id: Number(body.tag) };
     }
