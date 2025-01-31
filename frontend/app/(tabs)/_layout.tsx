@@ -18,7 +18,7 @@ export default function TabLayout() {
             }}
         >
             <Tabs.Screen
-                name="index"
+                name="(explore)"
                 options={{
                     title: 'Explore',
                     tabBarIcon: ({ color, focused }) => (
@@ -47,6 +47,12 @@ export default function TabLayout() {
             />
             <Tabs.Screen
                 name="sign-in"
+                options={{
+                    href: null,
+                }}
+            />
+            <Tabs.Screen
+                name="detail"
                 options={{
                     href: null,
                 }}

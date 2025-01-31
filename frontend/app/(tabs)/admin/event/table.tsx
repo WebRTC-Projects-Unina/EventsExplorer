@@ -7,6 +7,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { Event } from '../../../models/event';
 import { router, useFocusEffect, useNavigation } from 'expo-router';
 import { useSession } from '@/app/hooks/authProvider';
+import { formatDate } from '@/app/utils/dateFunctions';
 
 const EventTable = () => {
     const [events, setEvents] = useState<Event[]>([]);
@@ -60,11 +61,6 @@ const EventTable = () => {
         }).catch((error) => {
             console.log(error.response.status + ' ' + error.response.data.error);
         });
-    };
-
-    const formatDate = (isoDate: string) => {
-        const date = new Date(isoDate);
-        return format(date, 'dd.MM.yyyy');
     };
 
     const handleCreate = () => {

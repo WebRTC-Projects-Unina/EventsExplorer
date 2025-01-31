@@ -1,12 +1,15 @@
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import { Text, View, FlatList, StyleSheet, Modal, TouchableOpacity, ImageBackground, useWindowDimensions } from "react-native";
 import { format } from 'date-fns';
-import EventService from '../service/event.service';
-import { Event, Location, Tag } from '../models/event';
-import FilterComponent from "../components/filter.component";
-import LocationService from "../service/location.service";
-import { Search } from "../models/search";
+import EventService from '../../service/event.service';
+import { Event, Location, Tag } from '../../models/event';
+import FilterComponent from "../../components/filter.component";
+import LocationService from "../../service/location.service";
+import { Search } from "../../models/search";
+import { router, useFocusEffect, useNavigation } from 'expo-router';
 import { Icon, useTheme } from "react-native-paper";
+import { navigate } from "expo-router/build/global-state/routing";
+import { formatDate } from "@/app/utils/dateFunctions";
 
 export default function Index() {
 
@@ -133,27 +136,34 @@ export default function Index() {
     });
   }, []);
 
-  const formatDate = (isoDate: string) => {
-    const date = new Date(isoDate);
-    return format(date, 'dd.MM.yyyy');
-  };
-
   const handleFilters = (filters: Search) => {
     setFilter(filters);
   };
   const onTag = (tag: Tag) => {
     console.log(tag);
+
+    setFilter({ tag: tag.id, date: undefined, location: undefined, text: undefined });
   }
+
+  const handleOnEventClick = (id: number) => {
+    router.navigate({
+      pathname: '/event/[id]',
+      params: { id: id },
+    });
+  };
 
   const renderEvent = ({ item }: any) => (
     <View style={styles.eventCard} key={item.id}>
-      <ImageBackground
-        source={{ uri: item.Image?.filename }}
-        style={styles.imageBackground}
-      >
-        <View style={styles.overlay} />
-        <Text style={styles.eventName}>{item.name}</Text>
-      </ImageBackground>
+      <TouchableOpacity onPress={() => handleOnEventClick(item.id)}>
+        <ImageBackground
+          source={{ uri: item.Image?.filename }}
+          style={styles.imageBackground}
+        >
+          <View style={styles.overlay} />
+          <Text style={styles.eventName}>{item.name}</Text>
+        </ImageBackground>
+      </TouchableOpacity>
+
       <View style={styles.eventDetails}>
         <Text style={styles.eventDate}>
           <Icon size={14} source="calendar" />

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { Location } from '../models/event';
+import { Location, Tag } from '../models/event';
 import { Search } from "../models/search";
 import { Button, useTheme, TextInput, List } from 'react-native-paper';
 import { Dropdown, DropdownInputProps, Option } from 'react-native-paper-dropdown';
@@ -8,6 +8,7 @@ import DatePicker from "./datepicker.component";
 
 interface FilterProps {
   locations: Location[];
+  //tag: Tag;
   onApplyFilters: (filters: Search) => void;
 }
 
@@ -16,6 +17,7 @@ const FilterComponent: React.FC<FilterProps> = ({ locations, onApplyFilters }) =
   const [selectedDate, setSelectedDate] = useState<Date>(new Date(2024, 10, 24));
   const [location, setLocation] = useState<Number>();
   const theme = useTheme();
+  //const [selectedTag, setTag] = useState<Tag>();
 
   useEffect(() => {
 
