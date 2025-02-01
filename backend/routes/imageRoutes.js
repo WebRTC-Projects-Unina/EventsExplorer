@@ -6,7 +6,7 @@ import asyncHandler from 'express-async-handler';
 const log = log4js.getLogger("image route");
 const imageRouter = express.Router();
 
-imageRouter.post("/upload/upload-single", imageService.upload.single('file'), authenticateToken, authorizeAdmin, asyncHandler(async (req, res, next) => {
+imageRouter.post("/upload", imageService.upload.single('file'), asyncHandler(async (req, res, next) => {
     log.info("POST");
     await imageService.uploadSingleImage(req, res, next);
     res.json();

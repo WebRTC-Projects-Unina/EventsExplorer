@@ -23,11 +23,9 @@ const upload = multer({
     limits: { fileSize: 7 * 1024 * 1024 }
 });
 async function uploadSingleImage(req, res, next) {
-    console.log(req.file.filename);
     const image = { filename: req.file.filename, eventId: req.body.eventId };
     await imageRepository.addImage(image);
-
-    //res.status(200).json({ 'statusCode': 200, 'status': true, message: 'Image added', 'data': [] });
+    return res.status(200).json({ 'statusCode': 200, 'status': true, message: 'Image added', 'data': [] });
 
 }
 export { upload, uploadSingleImage };
