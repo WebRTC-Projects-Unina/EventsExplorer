@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, TextInput } from 'react-native-paper';
 import { View, StyleSheet } from 'react-native';
 import { useNavigation, useLocalSearchParams, router } from "expo-router";
-import LocationService from '../../../service/location.service';
-import { Location } from '../../../models/event';
+import LocationService from '../../../../../service/location.service';
+import { Location } from '../../../../../models/event';
 import Toast from 'react-native-toast-message';
 
 export default function EditEvent() {
@@ -19,7 +19,7 @@ export default function EditEvent() {
     const [loading, setLoading] = useState(true);
     const { getLocationById, createLocation, updateLocation } = LocationService();
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         let title = id == undefined ? "Create location" : "Edit location";
         navigation.setOptions({
             title,

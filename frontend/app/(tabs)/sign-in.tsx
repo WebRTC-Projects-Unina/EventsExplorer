@@ -2,17 +2,19 @@ import React from "react";
 import { router } from 'expo-router';
 import { Button } from 'react-native-paper';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
-import { useSession } from "../hooks/authProvider";
+
 import Toast from "react-native-toast-message";
+import { useSession } from "@/hooks/authProvider";
 
 export default function SignInScreen() {
     const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
     const { signIn } = useSession();
 
-    const signInLocal = async () => {
-        signIn(username, password).then(() => {
-            router.navigate("./admin/event/table", { relativeToDirectory: false })
+    const signInLocal = () => {
+        signIn(username, password).then((login) => {
+            router.replace("/(tabs)/(admin)/(drawer)/event/table");
+
         }).catch(error => {
             Toast.show({
                 type: 'error',

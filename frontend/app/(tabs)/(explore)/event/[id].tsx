@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import EventService from "../../../service/event.service";
-import { Event, Tag } from '../../../models/event';
-import { useLocalSearchParams } from "expo-router";
+import EventService from "../../../../service/event.service";
+import { Event, Tag } from '../../../../models/event';
+import { useLocalSearchParams, useNavigation } from "expo-router";
 import { Text, View, StyleSheet, TouchableOpacity, Image, Dimensions } from "react-native";
 import { Icon, useTheme } from "react-native-paper";
-import { calculateDate, formatDate } from "@/app/utils/dateFunctions";
+import { calculateDate, formatDate } from "@/utils/dateFunctions";
 
 export default function EventDetail() {
     const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -16,6 +16,14 @@ export default function EventDetail() {
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
     const screenWidth = Dimensions.get("window").width;
     const targetWidth = screenWidth * 0.5;
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        let title = "Event detail"
+        navigation.setOptions({
+            title,
+        });
+    }, [navigation]);
 
     useEffect(() => {
         Image.getSize(event?.Image?.filename || "", (width, height) => {
@@ -29,7 +37,12 @@ export default function EventDetail() {
 
     useEffect(() => {
         getEventById(Number(id)).then((response) => {
-            response.data.Image = { filename: images + "noflyer.png" };
+            if (response.data.Image == undefined) {
+                response.data.Image = { filename: images + "noflyer.png" };
+            }
+            else {
+                response.data.Image.filename = images + response.data.Image.filename;
+            }
             setEvent(response.data);
         }).catch((error) => {
             console.log(error.response?.error);
@@ -107,16 +120,16 @@ export default function EventDetail() {
             color: theme?.colors.primary,
         },
         left: {
-            flex: 2, // Left part takes half the width
+            flex: 2,
             alignItems: 'flex-start',
             marginRight: 10,
         },
         splitContainer: {
             marginTop: 20,
-            flexDirection: "row", // Align items in a horizontal row
-            justifyContent: "center", // Center horizontally
-            alignItems: "flex-start", // Center vertically
-            width: "80%", // Adjust width of the split section
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "flex-start",
+            width: "80%",
         },
         link: {
             textDecorationStyle: "dotted",
@@ -143,7 +156,7 @@ export default function EventDetail() {
                 <View style={styles.right}>
                     <Text style={styles.eventDate}>
                         <Icon size={14} source="calendar" />
-                        {formatDate(event?.date)}
+                        {formatDate(event?.date, true)}
                     </Text>
                     <Text style={styles.eventDate}>
                         {calculateDate(event?.date)}

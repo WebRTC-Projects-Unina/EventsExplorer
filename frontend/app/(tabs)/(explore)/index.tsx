@@ -1,15 +1,15 @@
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import { Text, View, FlatList, StyleSheet, Modal, TouchableOpacity, ImageBackground, useWindowDimensions } from "react-native";
 import { format } from 'date-fns';
-import EventService from '../../service/event.service';
-import { Event, Location, Tag } from '../../models/event';
-import FilterComponent from "../../components/filter.component";
-import LocationService from "../../service/location.service";
-import { Search } from "../../models/search";
+import EventService from '../../../service/event.service';
+import { Event, Location, Tag } from '../../../models/event';
+import FilterComponent from "../../../components/filter.component";
+import LocationService from "../../../service/location.service";
+import { Search } from "../../../models/search";
 import { router, useFocusEffect, useNavigation } from 'expo-router';
 import { Icon, useTheme } from "react-native-paper";
 import { navigate } from "expo-router/build/global-state/routing";
-import { formatDate } from "@/app/utils/dateFunctions";
+import { formatDate } from "@/utils/dateFunctions";
 
 export default function Index() {
 

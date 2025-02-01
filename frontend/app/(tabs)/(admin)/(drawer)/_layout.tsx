@@ -1,25 +1,11 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Drawer } from 'expo-router/drawer';
-import { Text } from 'react-native';
-import { useSession } from '@/app/hooks/authProvider';
-import { Redirect } from 'expo-router';
-import React from 'react';
-import { router } from 'expo-router';
+import React, { useEffect } from 'react';
 
 export default function AdminLayout() {
-    const { session, isLoading } = useSession();
-
-    if (isLoading) {
-        return <Text>Loading...</Text>;
-    }
-    if (session == null) {
-        return <Redirect href='../../sign-in' />;
-    }
-    router.push("/admin/event/table");
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            {/* initialRouteName='event/table' */}
             <Drawer initialRouteName="event/table" backBehavior="history">
                 <Drawer.Screen
                     name="event/table"
@@ -47,6 +33,13 @@ export default function AdminLayout() {
                     options={{
                         drawerLabel: 'Locations',
                         title: 'Locations',
+                    }}
+                />
+                <Drawer.Screen
+                    name="index"
+                    options={{
+                        drawerLabel: undefined,
+                        drawerItemStyle: { display: 'none' }
                     }}
                 />
             </Drawer>

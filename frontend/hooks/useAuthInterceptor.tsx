@@ -1,6 +1,5 @@
 import React from 'react';
 import axiosInstance from '../service/axiosInstance';
-import Toast from 'react-native-toast-message';
 import { useSession } from './authProvider';
 
 const useAxiosInterceptor = () => {
@@ -17,10 +16,10 @@ const useAxiosInterceptor = () => {
                 return config;
             },
             (error: any) => {
-                Toast.show({
-                    type: 'error',
-                    text1: error.request?.data?.error
-                });
+                // Toast.show({
+                //     type: 'error',
+                //     text1: error.request?.data?.error
+                // });
                 return Promise.reject(error);
             }
         );
@@ -30,10 +29,10 @@ const useAxiosInterceptor = () => {
                 return config;
             },
             (error: any) => {
-                Toast.show({
-                    type: 'error',
-                    text1: error.response?.status + ' ' + error.response?.data?.error
-                });
+                // Toast.show({
+                //     type: 'error',
+                //     text1: error.response?.status + ' ' + error.response?.data?.error
+                // });
                 return Promise.reject(error);
             }
         );

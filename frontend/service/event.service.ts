@@ -1,5 +1,5 @@
 import { Event } from '../models/event';
-import useAxiosInterceptor from '@/app/hooks/useAuthInterceptor';
+import useAxiosInterceptor from '@/hooks/useAuthInterceptor';
 import { Search } from '../models/search';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;

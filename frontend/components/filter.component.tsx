@@ -8,23 +8,20 @@ import DatePicker from "./datepicker.component";
 
 interface FilterProps {
   locations: Location[];
-  //tag: Tag;
   onApplyFilters: (filters: Search) => void;
 }
 
 const FilterComponent: React.FC<FilterProps> = ({ locations, onApplyFilters }) => {
   const [name, setName] = useState("");
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date(2024, 10, 24));
+  const [selectedDate, setSelectedDate] = useState<Date>();
   const [location, setLocation] = useState<Number>();
   const theme = useTheme();
-  //const [selectedTag, setTag] = useState<Tag>();
 
   useEffect(() => {
 
     if (location == 0) {
       setLocation(undefined);
     }
-
     onApplyFilters({ date: selectedDate, text: name, location: location, tag: undefined });
   }, [name, selectedDate, location]);
 

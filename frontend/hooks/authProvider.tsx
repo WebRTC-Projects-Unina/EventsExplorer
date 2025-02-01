@@ -1,18 +1,16 @@
 import { useContext, createContext, type PropsWithChildren } from 'react';
 import { useStorageState } from './useStorage';
-import * as UserService from '../service/user.service';
+import * as UserService from '@/service/user.service';
+import { Login } from '@/models/event';
 
-const AuthContext = createContext<{
-    signIn: (username: string, password: string) => Promise<any>;
+interface AuthContextProp {
+    signIn: (username: string, password: string) => Promise<Login | any>;
     signOut: () => void;
     session?: string | null;
     isLoading: boolean;
-}>({
-    signIn: () => new Promise((resolve, reject) => { }),
-    signOut: () => null,
-    session: null,
-    isLoading: false,
-});
+}
+
+const AuthContext = createContext<AuthContextProp>({} as AuthContextProp);
 
 
 export function useSession() {
@@ -33,6 +31,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
             value={{
                 signIn: (username: string, password: string) => {
                     return new Promise((resolve, reject) => {
+                        console.log(username);
                         if (username != undefined && password != undefined) {
                             UserService.login(username, password).then(response => {
                                 setSession(response.data.token);

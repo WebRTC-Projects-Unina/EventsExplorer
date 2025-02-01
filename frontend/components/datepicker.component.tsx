@@ -15,9 +15,9 @@ interface DatePickerProps {
     };
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({ initialDate = new Date(), onDateChange, theme }) => {
+const DatePicker: React.FC<DatePickerProps> = ({ initialDate, onDateChange, theme }) => {
     const [isModalVisible, setModalVisible] = useState(false);
-    const [selectedDate, setSelectedDate] = useState<Date>(initialDate);
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
     const toggleVisibility = () => setModalVisible(!isModalVisible);
 
@@ -36,7 +36,8 @@ const DatePicker: React.FC<DatePickerProps> = ({ initialDate = new Date(), onDat
                 label="Date"
                 onTouchStart={toggleVisibility}
                 onPointerDown={toggleVisibility}
-                value={dayjs(selectedDate).format('DD.MM.YYYY')} />
+                value={dayjs(selectedDate).format('DD.MM.YYYY')}
+            />
             <Modal animationType="slide" transparent={true} visible={isModalVisible}>
                 <View style={styles.overlay}>
                     <View style={styles.modalContent}>

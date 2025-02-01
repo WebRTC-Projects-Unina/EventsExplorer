@@ -1,13 +1,13 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { InteractionManager, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { DataTable, Button, IconButton, useTheme } from 'react-native-paper';
-import EventService from '../../../service/event.service';
+import EventService from '../../../../../service/event.service';
 import { format, setDate } from 'date-fns';
 import { ScrollView } from 'react-native-gesture-handler';
-import { Event } from '../../../models/event';
+import { Event } from '../../../../../models/event';
 import { router, useFocusEffect, useNavigation } from 'expo-router';
-import { useSession } from '@/app/hooks/authProvider';
-import { formatDate } from '@/app/utils/dateFunctions';
+import { useSession } from '@/hooks/authProvider';
+import { formatDate } from '@/utils/dateFunctions';
 
 const EventTable = () => {
     const [events, setEvents] = useState<Event[]>([]);
@@ -22,7 +22,7 @@ const EventTable = () => {
         // getEventsFromServer();
 
     }, []);
-    useLayoutEffect(() => {
+    useEffect(() => {
         let title = "Event overview";
         navigation.setOptions({
             title
@@ -85,11 +85,11 @@ const EventTable = () => {
             height: 56,
             justifyContent: 'center',
             alignItems: 'center',
+            elevation: 5,
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.3,
             shadowRadius: 4,
-            elevation: 5,
         },
     });
     return (
@@ -105,7 +105,7 @@ const EventTable = () => {
                     </DataTable.Header>
 
                     {events.map((event) => (
-                        <DataTable.Row key={event.id}>
+                        <DataTable.Row key={"table" + event.id}>
                             <DataTable.Cell>{event.name}</DataTable.Cell>
                             <DataTable.Cell>{event.description}</DataTable.Cell>
                             <DataTable.Cell>{event.Location?.name}</DataTable.Cell>

@@ -1,17 +1,16 @@
-import React, { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, useTheme, TextInput, List } from 'react-native-paper';
-import { View, Text, StyleSheet, Modal, Pressable, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions, GestureResponderEvent } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation, useLocalSearchParams } from "expo-router";
-import LocationService from '../../../service/location.service';
-import DateTimePicker from 'react-native-ui-datepicker';
-import dayjs from 'dayjs';
-import { MaterialIcons } from '@expo/vector-icons';
-import { Event, Location, Tag } from '../../../models/event';
+import LocationService from '../../../../../service/location.service';
+import { Event, Location, Tag } from '../../../../../models/event';
 import Toast from 'react-native-toast-message';
-import EventService from '@/app/service/event.service';
-import TagService from '@/app/service/tag.service';
+import EventService from '@/service/event.service';
+import TagService from '@/service/tag.service';
+import ImageService from '../../../../../service/image.service';
+import * as DocumentPicker from 'expo-document-picker';
 import { Dropdown, DropdownInputProps, Option } from 'react-native-paper-dropdown';
-import DatePicker from '@/app/components/datepicker.component';
+import DatePicker from '@/components/datepicker.component';
 
 
 export default function EditEvent() {
@@ -25,10 +24,12 @@ export default function EditEvent() {
     const [loading, setLoading] = useState(true);
     const [locations, setLocations] = useState<Location[]>([]);
     const [selectedLocationId, setSelectedLocationId] = useState<string>();
+    const [selectedDocument, setSelectedDocuments] = useState<any>();
     const theme = useTheme();
     const { getEventById, updateEvent, createEvent } = EventService();
     const { getLocations } = LocationService();
     const { getTags } = TagService();
+    const { upload } = ImageService();
     const [results, setResults] = useState<Tag[]>([]);
     const [text, setText] = useState('');
     const [tags, setTags] = useState<Tag[]>([]);
@@ -65,12 +66,11 @@ export default function EditEvent() {
         setTags(tags.filter(tag => tag !== tagToRemove));
     };
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         let title = id == undefined ? "Create event" : "Edit event";
         navigation.setOptions({
             title,
         });
-
     }, [navigation]);
 
     useEffect(() => {
@@ -129,6 +129,22 @@ export default function EditEvent() {
         return options;
     }
 
+    const uploadFile = async () => {
+        DocumentPicker
+            .getDocumentAsync({ type: "*/*", copyToCacheDirectory: true })
+            .then(response => {
+                if (response.assets != null && response.assets.length > 0) {
+                    let fileToUpload = {
+                        name: response.assets[0].name,
+                        uri: response.assets[0].uri,
+                        mimetype: response.assets[0].mimeType,
+                        filename: response.assets[0].name
+                    };
+                    setSelectedDocuments(fileToUpload);
+                }
+            });
+    };
+
     const handleSave = () => {
 
         if (event != undefined) {
@@ -145,7 +161,15 @@ export default function EditEvent() {
                             type: 'success',
                             text1: 'Event successfully created!'
                         });
-                        navigation.goBack();
+                        if (selectedDocument != undefined) {
+                            uploadImage(response.data.id).then(() => {
+                                navigation.goBack();
+                            })
+                                .catch((error: any) => {
+                                    console.log(error);
+                                });
+                        }
+
                     })
                     .catch(error => {
 
@@ -153,7 +177,14 @@ export default function EditEvent() {
             } else {
                 updateEvent(event)
                     .then(response => {
-                        navigation.goBack();
+                        if (selectedDocument != undefined) {
+                            uploadImage(event.id).then(() => {
+                                navigation.goBack();
+                            })
+                                .catch((error: any) => {
+                                    console.log(error);
+                                });
+                        }
                     })
                     .catch(error => {
 
@@ -161,6 +192,10 @@ export default function EditEvent() {
             }
         }
     };
+
+    const uploadImage = (eventId: number) => {
+        return upload(selectedDocument, eventId);
+    }
     const CustomDropdownInput = ({
         placeholder,
         selectedLabel,
@@ -263,6 +298,8 @@ export default function EditEvent() {
                     value={selectedLocationId}
                     placeholder="Select Location" options={mapLocationsToOption()}
                 />
+                <Button onPress={uploadFile} >Upload File</Button>
+
 
                 <View style={styles.input}>
                     <TextInput
@@ -301,6 +338,6 @@ export default function EditEvent() {
                     </View>
                 </View>
             </View>
-        </View >
+        </View>
     );
 }

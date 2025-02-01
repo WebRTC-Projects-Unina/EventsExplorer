@@ -1,9 +1,9 @@
 import { useFocusEffect, useNavigation, router } from 'expo-router';
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { InteractionManager, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { DataTable, Button, IconButton } from 'react-native-paper';
-import { Location } from '../../../models/event';
-import LocationService from '@/app/service/location.service';
+import { Location } from '../../../../../models/event';
+import LocationService from '@/service/location.service';
 import React from 'react';
 
 export default function LocationTable() {
@@ -12,7 +12,7 @@ export default function LocationTable() {
     const { getLocations, deleteLocation } = LocationService();
     const [loading, setLoading] = useState(false);
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         let title = "Locations";
         navigation.setOptions({
             title

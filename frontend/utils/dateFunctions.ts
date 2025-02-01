@@ -1,12 +1,15 @@
 import { format } from "date-fns";
 
-const formatDate = (isoDate: string | undefined) => {
+const formatDate = (isoDate: string | undefined, includeWeekDay = false) => {
 
     if (isoDate == undefined) {
         return "";
     }
     const date = new Date(isoDate);
-    return " " + format(date, 'EEEE').toUpperCase() + ", " + format(date, 'dd.LLL.yyyy');
+    if (includeWeekDay) {
+        return " " + format(date, 'EEEE').toUpperCase() + ", " + format(date, 'dd.LLL.yyyy');
+    }
+    return format(date, 'dd.LLL.yyyy');
 };
 
 const calculateDate = (isoDate: string | undefined) => {

@@ -9,7 +9,6 @@ export default function TabLayout() {
                 headerStyle: {
                     backgroundColor: '#000',
                 },
-
                 headerShadowVisible: false,
                 headerTintColor: '#fff',
                 tabBarStyle: {
@@ -36,7 +35,7 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="admin"
+                name="(admin)"
                 options={{
                     title: 'Admin area',
                     tabBarLabel: 'Admin',
@@ -51,12 +50,7 @@ export default function TabLayout() {
                     href: null,
                 }}
             />
-            <Tabs.Screen
-                name="detail"
-                options={{
-                    href: null,
-                }}
-            />
+
         </Tabs>
     );
 }
