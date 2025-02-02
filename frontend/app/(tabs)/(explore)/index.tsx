@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, useEffect, useState } from "react";
-import { Text, View, FlatList, StyleSheet, Modal, TouchableOpacity, ImageBackground, useWindowDimensions } from "react-native";
+import { Text, View, FlatList, StyleSheet, Modal, TouchableOpacity, ImageBackground, useWindowDimensions, RefreshControl } from "react-native";
 import { format } from 'date-fns';
 import EventService from '../../../service/event.service';
 import { Event, Location, Tag } from '../../../models/event';
@@ -24,6 +24,7 @@ export default function Index() {
   const [locations, setLocations] = useState<Location[]>([]);
   const { width } = useWindowDimensions();
   const isSmallScreen = width < 600;
+  const [refreshing, setRefreshing] = useState(false);
   const styles = StyleSheet.create({
     eventCard: {
       margin: 10,
@@ -111,21 +112,7 @@ export default function Index() {
 
   useEffect(() => {
     setLoading(true);
-    getEvents(filter).then((response) => {
-      response.data.map((o) => {
-        if (o.Image == undefined) {
-          o.Image = { filename: images + "noflyer.png" };
-        }
-        else {
-          o.Image = { filename: images + o.Image?.filename };
-        }
-      });
-      setEvents(response.data);
-    }).catch((error) => {
-      console.log(error.response?.error);
-    }).finally(() => {
-      setLoading(false);
-    });
+    loadEvents();
 
   }, [filter]);
 
@@ -153,6 +140,29 @@ export default function Index() {
       pathname: '/event/[id]',
       params: { id: id },
     });
+  };
+  const loadEvents = () => {
+    getEvents(filter).then((response) => {
+      response.data.map((o) => {
+        if (o.Image == undefined) {
+          o.Image = { filename: images + "noflyer.png" };
+        }
+        else {
+          o.Image = { filename: images + o.Image?.filename };
+        }
+      });
+      setEvents(response.data);
+    }).catch((error) => {
+      console.log(error.response?.error);
+    }).finally(() => {
+      setLoading(false);
+      setRefreshing(false);
+    });
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadEvents();
   };
 
   const renderEvent = ({ item }: any) => (
@@ -198,6 +208,13 @@ export default function Index() {
       {events.length == 0 ? <Text>No data</Text>
         : <FlatList
           key={numberOfColumns}
+          refreshControl={<RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[theme.colors.onPrimary]}
+            progressBackgroundColor={theme.colors.primary}
+          />}
+
           contentContainerStyle={{ padding: 20, justifyContent: "center", width: "100%", alignItems: "center" }}
           data={events}
           renderItem={renderEvent}

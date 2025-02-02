@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, useWindowDimensions } from "react-native";
 import { Location } from '../models/event';
 import { Search } from "../models/search";
 import { Button, useTheme, TextInput, List } from 'react-native-paper';
@@ -16,6 +16,9 @@ const FilterComponent: React.FC<FilterProps> = ({ locations, onApplyFilters }) =
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [location, setLocation] = useState<Number>();
   const theme = useTheme();
+  const { width } = useWindowDimensions();
+  const isSmallScreen = width < 600;
+
   useEffect(() => {
 
     if (location == 0) {
@@ -65,26 +68,29 @@ const FilterComponent: React.FC<FilterProps> = ({ locations, onApplyFilters }) =
         value={name}
         onChangeText={setName}
       />
-      <View style={{ marginRight: 5 }}>
-        <DatePicker
-          initialDate={selectedDate}
-          onDateChange={handleDateChange}
-          theme={theme}
-        />
-      </View>
+      {isSmallScreen ? null :
+        <View style={{ flexDirection: "row" }}>
+          <View style={{ marginRight: 5 }}>
+            <DatePicker
+              initialDate={selectedDate}
+              onDateChange={handleDateChange}
+              theme={theme}
+            />
+          </View>
+          <Dropdown
 
-      <Dropdown
-
-        CustomDropdownInput={CustomDropdownInput}
-        mode="outlined"
-        label="Locations"
-        hideMenuHeader={true}
-        onSelect={(value) => {
-          setLocation(Number(value));
-        }}
-        value={location?.toString()}
-        placeholder="Select Location" options={mapLocationsToOption()}
-      />
+            CustomDropdownInput={CustomDropdownInput}
+            mode="outlined"
+            label="Locations"
+            hideMenuHeader={true}
+            onSelect={(value) => {
+              setLocation(Number(value));
+            }}
+            value={location?.toString()}
+            placeholder="Select Location" options={mapLocationsToOption()}
+          />
+        </View>
+      }
       <Button mode="contained" onPress={handleClear} >Clear</Button>
     </View >
   );
