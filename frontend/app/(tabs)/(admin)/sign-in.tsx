@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
-import { Button } from 'react-native-paper';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { Button, useTheme, TextInput, List } from 'react-native-paper';
 
 import Toast from "react-native-toast-message";
 import { useSession } from "@/hooks/authProvider";
@@ -26,25 +26,23 @@ export default function SignInScreen() {
     return (
         <View style={styles.container}>
             <View style={styles.form}>
-                <View style={styles.inputRow}>
-                    <Text style={styles.label}>Username:</Text>
-                    <TextInput
-                        style={styles.input}
-                        value={username}
-                        onChangeText={setUsername}
-                        placeholder="Enter name"
-                    />
-                </View>
-                <View style={styles.inputRow}>
-                    <Text style={styles.label}>Password:</Text>
-                    <TextInput
-                        secureTextEntry
-                        style={styles.input}
-                        value={password}
-                        onChangeText={setPassword}
-                        placeholder="Enter password"
-                    />
-                </View>
+                <TextInput
+                    style={styles.input}
+                    mode='outlined'
+                    label="User"
+                    placeholder="Enter username"
+                    value={username}
+                    onChangeText={setUsername}
+                />
+                <TextInput
+                    mode='outlined'
+                    secureTextEntry
+                    style={styles.input}
+                    value={password}
+                    label="Password"
+                    onChangeText={setPassword}
+                    placeholder="Enter password"
+                />
                 <View style={styles.buttonRow}>
                     <Button mode="contained" style={styles.actionButton} onPress={() => signInLocal()}>Sign in</Button>
                 </View>
@@ -66,10 +64,16 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 20,
     },
+
     form: {
+        flex: 1,
         width: '100%',
-        marginTop: 40,
-        maxWidth: 400,
+        marginTop: 5,
+        maxWidth: 600,
+    },
+    input: {
+        width: "100%",
+        marginBottom: 10
     },
     inputRow: {
         flexDirection: 'row',
@@ -83,14 +87,14 @@ const styles = StyleSheet.create({
         textAlign: 'right',
         marginRight: 10,
     },
-    input: {
-        width: '65%',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        padding: 10,
-        borderRadius: 5,
-        backgroundColor: '#fff',
-    },
+    // input: {
+    //     width: '65%',
+    //     borderWidth: 1,
+    //     borderColor: '#ccc',
+    //     padding: 10,
+    //     borderRadius: 5,
+    //     backgroundColor: '#fff',
+    // },
     buttonRow: {
         flexDirection: 'row',
         justifyContent: 'space-around',
