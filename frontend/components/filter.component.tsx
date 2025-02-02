@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { Location, Tag } from '../models/event';
+import { Location } from '../models/event';
 import { Search } from "../models/search";
 import { Button, useTheme, TextInput, List } from 'react-native-paper';
 import { Dropdown, DropdownInputProps, Option } from 'react-native-paper-dropdown';
 import DatePicker from "./datepicker.component";
-import { setDate } from "date-fns";
 
 interface FilterProps {
   locations: Location[];
@@ -17,7 +16,6 @@ const FilterComponent: React.FC<FilterProps> = ({ locations, onApplyFilters }) =
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [location, setLocation] = useState<Number>();
   const theme = useTheme();
-
   useEffect(() => {
 
     if (location == 0) {
@@ -88,7 +86,7 @@ const FilterComponent: React.FC<FilterProps> = ({ locations, onApplyFilters }) =
         placeholder="Select Location" options={mapLocationsToOption()}
       />
       <Button mode="contained" onPress={handleClear} >Clear</Button>
-    </View>
+    </View >
   );
 };
 
@@ -119,7 +117,11 @@ const styles = StyleSheet.create({
     padding: 0,
     marginRight: 5,
   },
+  containerSmall: {
+    flexDirection: "column",
+    flex: 1,
 
+  },
 
   pickerContainer: {
     borderWidth: 1,

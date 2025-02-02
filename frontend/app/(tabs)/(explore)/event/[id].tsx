@@ -17,6 +17,7 @@ export default function EventDetail() {
     const screenWidth = Dimensions.get("window").width;
     const targetWidth = screenWidth * 0.5;
     const navigation = useNavigation();
+    const isSmallScreen = screenWidth < 600;
 
     useEffect(() => {
         let title = "Event detail"
@@ -26,23 +27,27 @@ export default function EventDetail() {
     }, [navigation]);
 
     useEffect(() => {
-        Image.getSize(event?.Image?.filename || "", (width, height) => {
-            const aspectRatio = width / height;
-            setImageSize({
-                width: targetWidth,
-                height: targetWidth / aspectRatio,
-            });
+        Image.getSize(event?.Image?.filename || images + "noflyer.png", (width, height) => {
+            setImage(width, height);
+        }, (error) => {
+            setImage(200, 300);
         });
     }, [targetWidth, event]);
 
+    const setImage = (width: number, height: number) => {
+        const aspectRatio = width / height;
+        setImageSize({
+            width: targetWidth,
+            height: targetWidth / aspectRatio,
+        });
+    }
+
     useEffect(() => {
         getEventById(Number(id)).then((response) => {
-            if (response.data.Image == undefined) {
-                response.data.Image = { filename: images + "noflyer.png" };
-            }
-            else {
+            if (response.data.Image != undefined) {
                 response.data.Image.filename = images + response.data.Image.filename;
             }
+
             setEvent(response.data);
         }).catch((error) => {
             console.log(error.response?.error);
@@ -52,6 +57,8 @@ export default function EventDetail() {
     }, []);
 
     const openInNewTab = (url: string): void => {
+        if (window.open == undefined)
+            return;
         const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
         if (newWindow) newWindow.opener = null
     }
@@ -74,6 +81,7 @@ export default function EventDetail() {
 
         },
         eventDetails: {
+            marginLeft: 10,
             borderColor: "black",
             borderWidth: 1,
             backgroundColor: "#d5d5d5",
@@ -122,14 +130,14 @@ export default function EventDetail() {
         left: {
             flex: 2,
             alignItems: 'flex-start',
-            marginRight: 10,
+            marginRight: 30,
         },
         splitContainer: {
             marginTop: 20,
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "flex-start",
-            width: "80%",
+            width: isSmallScreen ? "90%" : "75%",
         },
         link: {
             textDecorationStyle: "dotted",

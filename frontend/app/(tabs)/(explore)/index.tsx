@@ -23,7 +23,7 @@ export default function Index() {
   const [filter, setFilter] = useState<Search>();
   const [locations, setLocations] = useState<Location[]>([]);
   const { width } = useWindowDimensions();
-
+  const isSmallScreen = width < 600;
   const styles = StyleSheet.create({
     eventCard: {
       margin: 10,
@@ -34,7 +34,7 @@ export default function Index() {
       shadowOpacity: 0.2,
       shadowRadius: 3,
       backgroundColor: "#f3f3f3",
-      width: 300,
+      width: isSmallScreen ? 180 : 300,
       marginBottom: 10,
     },
     imageBackground: {
@@ -101,7 +101,6 @@ export default function Index() {
   };
   const [numberOfColumns, setNumberOfColumns] = useState(calcNumColumns(width));
   const openInNewTab = (url: string): void => {
-    console.log(url);
     const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
     if (newWindow) newWindow.opener = null
   }
@@ -114,8 +113,12 @@ export default function Index() {
     setLoading(true);
     getEvents(filter).then((response) => {
       response.data.map((o) => {
-        if (o.Image == undefined)
+        if (o.Image == undefined) {
           o.Image = { filename: images + "noflyer.png" };
+        }
+        else {
+          o.Image = { filename: images + o.Image?.filename };
+        }
       });
       setEvents(response.data);
     }).catch((error) => {
@@ -188,18 +191,21 @@ export default function Index() {
     </View>
   );
   return (
-    <View style={{ height: "90%" }}>
+    <View style={{ height: "100%" }}>
       <View style={{ marginBottom: 10, alignItems: "center" }}>
         <FilterComponent locations={locations} onApplyFilters={handleFilters} />
       </View>
-      <FlatList
-        key={numberOfColumns}
-        contentContainerStyle={{ padding: 10, justifyContent: "center", width: "100%", alignItems: "center" }}
-        data={events}
-        renderItem={renderEvent}
-        keyExtractor={(item) => item.id.toString()}
-        numColumns={numberOfColumns}
-      />
+      {events.length == 0 ? <Text>No data</Text>
+        : <FlatList
+          key={numberOfColumns}
+          contentContainerStyle={{ padding: 20, justifyContent: "center", width: "100%", alignItems: "center" }}
+          data={events}
+          renderItem={renderEvent}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={numberOfColumns}
+        />
+      }
+
     </View>
   );
 }

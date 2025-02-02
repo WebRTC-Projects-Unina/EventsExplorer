@@ -1,19 +1,19 @@
-import React from "react";
 import { router } from 'expo-router';
 import { Button } from 'react-native-paper';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 
 import Toast from "react-native-toast-message";
 import { useSession } from "@/hooks/authProvider";
+import { useState } from 'react';
 
 export default function SignInScreen() {
-    const [username, setUsername] = React.useState('');
-    const [password, setPassword] = React.useState('');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const { signIn } = useSession();
 
     const signInLocal = () => {
         signIn(username, password).then((login) => {
-            router.replace("/(tabs)/(admin)/(drawer)/event/table");
+            router.replace("/(tabs)/(admin)/(drawer)");
 
         }).catch(error => {
             Toast.show({

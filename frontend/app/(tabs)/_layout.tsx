@@ -44,12 +44,13 @@ export default function TabLayout() {
                     ),
                 }}
             />
-            <Tabs.Screen
+            {/* <Tabs.Screen
                 name="sign-in"
                 options={{
+
                     href: null,
                 }}
-            />
+            /> */}
             <Tabs.Screen
                 name="index"
                 options={{

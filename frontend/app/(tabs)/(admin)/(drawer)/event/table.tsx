@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { InteractionManager, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { InteractionManager, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { DataTable, Button, IconButton, useTheme } from 'react-native-paper';
 import EventService from '../../../../../service/event.service';
-import { format, setDate } from 'date-fns';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Event } from '../../../../../models/event';
 import { router, useFocusEffect, useNavigation } from 'expo-router';
@@ -15,13 +14,10 @@ const EventTable = () => {
     const { signOut } = useSession();
     const navigation = useNavigation();
     const theme = useTheme();
-
+    const { width } = useWindowDimensions();
+    const isSmallScreen = width < 600;
     const { getEvents, deleteEvent, getEventById, updateEvent } = EventService();
-    useEffect(() => {
-        //signOut();
-        // getEventsFromServer();
 
-    }, []);
     useEffect(() => {
         let title = "Event overview";
         navigation.setOptions({
@@ -74,6 +70,7 @@ const EventTable = () => {
         },
         actionButton: {
             marginHorizontal: 4,
+            minWidth: 30
         },
         fab: {
             backgroundColor: theme.colors.primary,
@@ -98,18 +95,20 @@ const EventTable = () => {
                 <DataTable>
                     <DataTable.Header>
                         <DataTable.Title>Name</DataTable.Title>
-                        <DataTable.Title>Description</DataTable.Title>
-                        <DataTable.Title>Location ID</DataTable.Title>
-                        <DataTable.Title>Date</DataTable.Title>
+                        {isSmallScreen ? null : <DataTable.Title>Description</DataTable.Title>}
+                        {isSmallScreen ? null : <DataTable.Title>Location ID</DataTable.Title>}
+                        {isSmallScreen ? null : <DataTable.Title>Date</DataTable.Title>}
+
                         <DataTable.Title>Actions</DataTable.Title>
                     </DataTable.Header>
 
                     {events.map((event) => (
                         <DataTable.Row key={"table" + event.id}>
                             <DataTable.Cell>{event.name}</DataTable.Cell>
-                            <DataTable.Cell>{event.description}</DataTable.Cell>
-                            <DataTable.Cell>{event.Location?.name}</DataTable.Cell>
-                            <DataTable.Cell>{formatDate(event.date)}</DataTable.Cell>
+                            {isSmallScreen ? null : <DataTable.Cell >{event.description}</DataTable.Cell>}
+                            {isSmallScreen ? null : <DataTable.Cell >{event.Location?.name}</DataTable.Cell>}
+                            {isSmallScreen ? null : <DataTable.Cell>{formatDate(event.date)}</DataTable.Cell>}
+
                             <DataTable.Cell>
                                 <Button mode="contained" onPress={() => handleEdit(event.id)} style={styles.actionButton}>
                                     Edit

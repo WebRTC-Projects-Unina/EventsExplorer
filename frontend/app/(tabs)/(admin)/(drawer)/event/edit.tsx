@@ -156,38 +156,29 @@ export default function EditEvent() {
             event.Tags = tags;
             if (event.id == undefined || event.id == 0) {
                 createEvent(event)
-                    .then(response => {
+                    .then(async response => {
                         Toast.show({
                             type: 'success',
                             text1: 'Event successfully created!'
                         });
                         if (selectedDocument != undefined) {
-                            uploadImage(response.data.id).then(() => {
-                                navigation.goBack();
-                            })
-                                .catch((error: any) => {
-                                    console.log(error);
-                                });
+                            await uploadImage(response.data.id);
                         }
-
+                        navigation.goBack();
                     })
                     .catch(error => {
 
                     });
             } else {
                 updateEvent(event)
-                    .then(response => {
+                    .then(async response => {
                         if (selectedDocument != undefined) {
-                            uploadImage(event.id).then(() => {
-                                navigation.goBack();
-                            })
-                                .catch((error: any) => {
-                                    console.log(error);
-                                });
+                            await uploadImage(event.id);
                         }
+                        navigation.goBack();
                     })
                     .catch(error => {
-
+                        console.log(error);
                     });
             }
         }
@@ -323,7 +314,7 @@ export default function EditEvent() {
                     {
                         <View style={styles.tagContainer}>
                             {tags.map((tag) => (
-                                <TouchableOpacity key={tag.id} style={styles.tag} onPress={() => removeTag(tag)}>
+                                <TouchableOpacity key={"tag" + tag.id} style={styles.tag} onPress={() => removeTag(tag)}>
                                     <Text style={styles.tagText}>{tag.name}</Text>
                                     <Text style={styles.removeTagText}> x</Text>
                                 </TouchableOpacity>
