@@ -5,6 +5,7 @@ import { Search } from "../models/search";
 import { Button, useTheme, TextInput, List } from 'react-native-paper';
 import { Dropdown, DropdownInputProps, Option } from 'react-native-paper-dropdown';
 import DatePicker from "./datepicker.component";
+import { setDate } from "date-fns";
 
 interface FilterProps {
   locations: Location[];
@@ -31,6 +32,11 @@ const FilterComponent: React.FC<FilterProps> = ({ locations, onApplyFilters }) =
   }
   const handleDateChange = (date: Date) => {
     setSelectedDate(date);
+  };
+  const handleClear = () => {
+    setName("");
+    setLocation(undefined);
+    setSelectedDate(new Date());
   };
   const CustomDropdownInput = ({
     placeholder,
@@ -81,7 +87,7 @@ const FilterComponent: React.FC<FilterProps> = ({ locations, onApplyFilters }) =
         value={location?.toString()}
         placeholder="Select Location" options={mapLocationsToOption()}
       />
-      <Button mode="contained" >Clear</Button>
+      <Button mode="contained" onPress={handleClear} >Clear</Button>
     </View>
   );
 };

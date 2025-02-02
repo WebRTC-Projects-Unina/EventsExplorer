@@ -20,6 +20,10 @@ export default function TestLayout() {
     }
 
     return (
-        <Slot />
+        <SessionProvider>
+
+            <Slot />
+        </SessionProvider>
+
     );
 }
