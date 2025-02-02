@@ -19,12 +19,15 @@ async function getEvents(body) {
         where: {
             [Op.and]: []
         }, include: [db.Location, db.Image, {
+
+
             model: db.Tag, attributes: ['id', 'name'],
             where: tagFilter,
             through: {
                 attributes: [],
             }
-        },]
+        },
+        ]
     };
     if (body.locationId != undefined) {
         search.where[Op.and].push({ locationId: body.locationId });

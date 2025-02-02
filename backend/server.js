@@ -30,7 +30,7 @@ const port = 3000;
 //Security, Compression & Parser
 app.use(helmet());
 app.use(hpp());
-app.use(cors({ credentials: true, origin: 'http://localhost:8081' }));
+app.use(cors({ credentials: true, origin: '*' }));
 app.use(compression());
 app.use(express.json());
 
@@ -48,7 +48,7 @@ app.use('/api/locations', validate, locationRouter);
 app.use('/api/tags', validate, tagRouter);
 app.use('/api/images', validate, imageRouter);
 app.use('/images', (_, res, next) => {
-    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.set('Cross-Origin-Resource-Policy', '*');
     next();
 });
 app.use('/images', express.static(path.join(__dirname, 'assets/images')));

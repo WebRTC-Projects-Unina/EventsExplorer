@@ -70,7 +70,7 @@ eventRouter.put('/:id', authenticateToken, authorizeAdmin, asyncHandler(async (r
 
     // * call update service
     await eventService.updateEvent(req.body, id);
-    res.status(200).end();
+    return res.status(200).json();
 }));
 
 // * @route DELETE /api/events/:id

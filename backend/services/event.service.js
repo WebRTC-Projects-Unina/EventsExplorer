@@ -11,11 +11,9 @@ async function getEvents(body) {
     const data = await eventRepository.getEvents(body);
     data.forEach(element => {
         if (element.Image == null) {
-            element.Image = { filename: 'http://localhost:3000/images/noflyer.png' };
+            element.Image = { filename: 'noflyer.png' };
         }
-        else {
-            element.Image.filename = 'http://localhost:3000/images/' + element.Image.filename;
-        }
+
     });
     return data;
 
